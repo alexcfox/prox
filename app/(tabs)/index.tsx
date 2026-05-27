@@ -1,14 +1,27 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
-
-export default function TabOneScreen() {
+export default function HomeScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          latitude: 33.6405,
+          longitude: -117.6031,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        }}
+      >
+        <Marker
+          coordinate={{
+            latitude: 33.6405,
+            longitude: -117.6031,
+          }}
+          title="Marker"
+          description="Hello from Expo Maps"
+        />
+      </MapView>
     </View>
   );
 }
@@ -16,16 +29,9 @@ export default function TabOneScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  map: {
+    width: '100%',
+    height: '100%',
   },
 });
