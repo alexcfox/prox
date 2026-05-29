@@ -20,7 +20,7 @@ export default function Map() {
 	const [cameraStats, setCameraStats] = useState<{altitude?: number, pitch?: number} | null>({ altitude: 6500, pitch: 0 });
 
 	const theme = useTheme();
-	const { baseType, pickerVisible, openPicker, mapRef } = useMapStore();
+	const { baseType, pickerVisible, openPicker, mapRef, setUserLocation, recenter } = useMapStore();
 
 	const mapType = BASE_MAP[baseType];
 
@@ -76,6 +76,13 @@ const handleRegionChangeComplete = async () => {
 				mapType={mapType.type}
 				ref={mapRef}
                 onRegionChangeComplete={handleRegionChangeComplete}
+				showsUserLocation={true}
+				onUserLocationChange={(event) => {
+					const coord = event.nativeEvent.coordinate;
+					if (!coord) return;
+					const { latitude, longitude } = coord;
+					setUserLocation({ latitude, longitude });
+				}}
 				rotateEnabled
 				pitchEnabled
 				showsCompass
@@ -105,6 +112,14 @@ const handleRegionChangeComplete = async () => {
 					onPress={handle3DToggle}
 					disabled={pickerVisible}
 				/>
+
+				<Pressable
+					style={[styles.button, { backgroundColor: theme.colors.background }]}
+					onPress={recenter}
+					disabled={pickerVisible}
+				>
+					<SymbolView name="location.fill" size={20} tintColor={theme.colors.primaryText} />
+				</Pressable>
 
 				<Pressable
 					style={[styles.button, { backgroundColor: theme.colors.background }]}
