@@ -17,7 +17,7 @@ type BaseType = "explore" | "satellite";
 export default function MapTypeModal() {
 
     const theme = useTheme();
-    const { baseType, setBaseType, is3D, setIs3D, mapRef } = useMapStore();
+    const { baseType, setBaseType } = useMapStore();
 
   const { openPicker, closePicker, sheetStyle, backdropStyle } = useMapPickerAnimation();
 
@@ -43,7 +43,7 @@ export default function MapTypeModal() {
           </View>
 
           <View style={styles.optionsRow}>
-            {(["explore", "satellite"] as BaseType[]).map((type) => {
+            {(["satellite", "explore"] as BaseType[]).map((type) => {
               const active = baseType === type;
               const label = type === "explore" ? "Explore" : "Satellite";
               const symbol = type === "explore" ? "map.fill" : "globe.americas.fill";

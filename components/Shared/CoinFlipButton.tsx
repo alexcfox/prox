@@ -2,11 +2,11 @@ import { useTheme } from "@/theme/theme";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 import Animated, {
-    runOnJS,
-    useAnimatedStyle,
-    useSharedValue,
-    withSequence,
-    withTiming,
+	runOnJS,
+	useAnimatedStyle,
+	useSharedValue,
+	withSequence,
+	withTiming,
 } from "react-native-reanimated";
 
 interface CoinFlipButtonProps {
@@ -48,7 +48,7 @@ export default function CoinFlipButton({ is3D, onPress, disabled }: CoinFlipButt
     }, [is3D]);
     
     return (
-        <Animated.View style={[styles.container, { backgroundColor: theme.colors.background }, animatedStyle]}>
+        <Animated.View style={[styles.container, { backgroundColor: theme.colors.secondaryBackground }, animatedStyle]}>
             <Pressable
                 onPress={handlePress}
                 disabled={disabled}

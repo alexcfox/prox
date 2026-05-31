@@ -1,23 +1,19 @@
+import "react-native-gesture-handler";
+
 import { ThemeProvider } from "@/theme/theme";
 import { Stack } from "expo-router";
-import { StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function RootLayout() {
-  return (
-    <ThemeProvider>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      />
-    </ThemeProvider>
-  );
+    return (
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <ThemeProvider>
+                <Stack
+                    screenOptions={{
+                        headerShown: false,
+                    }}
+                />
+            </ThemeProvider>
+        </GestureHandlerRootView>
+    );
 }
-
-
-
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-  },
-});
