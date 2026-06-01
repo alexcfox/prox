@@ -1,13 +1,14 @@
 import { useMapStore } from "@/stores/mapStore";
 import {
-    Easing,
-    runOnJS,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
+  Easing,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
 } from "react-native-reanimated";
 
-const SHEET_DURATION = 300;
+const SHEET_DURATION = 600;
 const SHEET_OFFSET = 280;
 
 export function useMapPickerAnimation() {
@@ -17,8 +18,9 @@ export function useMapPickerAnimation() {
   const backdropOpacity = useSharedValue(0);
 
   const openPicker = () => {
-    slideY.value = withTiming(0, { duration: SHEET_DURATION, easing: Easing.out(Easing.cubic) });
-    backdropOpacity.value = withTiming(1, { duration: SHEET_DURATION });
+      slideY.value = SHEET_OFFSET;
+      backdropOpacity.value = withDelay(400, withTiming(1, { duration: SHEET_DURATION }));
+      slideY.value = withDelay(400, withTiming(0, { duration: SHEET_DURATION, easing: Easing.out(Easing.cubic) }));
   };
 
   const closePicker = () => {

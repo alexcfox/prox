@@ -62,9 +62,9 @@ export default function CoinFlipButton({ is3D, onPress, disabled }: CoinFlipButt
 
 const styles = StyleSheet.create({
 	container: {
-		width: 42,
-		height: 42,
-		borderRadius: 21,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
 		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.15,

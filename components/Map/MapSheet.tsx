@@ -1,56 +1,59 @@
-import { useMapSheetStore } from "@/stores/mapSheetStore";
 import { useTheme } from "@/theme/theme";
-import BottomSheet, {
-    BottomSheetScrollView,
-} from "@gorhom/bottom-sheet";
-import React, { useMemo, useRef } from "react";
-import {
-    Pressable,
-    StyleSheet,
-    View
-} from "react-native";
+import BottomSheet from "@gorhom/bottom-sheet";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
     interpolate,
     useAnimatedStyle,
-    useSharedValue,
+    useSharedValue
 } from "react-native-reanimated";
-import MapTabBar from "./MapTabBar";
+import Places from "./Places/Places";
 
-export default function MapSheet() {
+type Props = {
+    hidden?: boolean;
+};
 
+export default function MapSheet({ hidden }: Props) {
     const theme = useTheme();
-
+    
     const sheetRef = useRef<BottomSheet>(null);
 
-    const animatedIndex = useSharedValue(0);
-
-    const {
-        selectedTab,
-        setSelectedTab,
-    } = useMapSheetStore();
+    const animatedIndex = useSharedValue(1);
 
     const snapPoints = useMemo(
-        () => [90, "38%", "92%"],
+        () => [150, "92%"],
         []
     );
 
-    const currentIndexRef = useRef(0);
+    const currentIndexRef = useRef(1);
+    const [sheetIndex, setSheetIndex] = useState(0);
+    const settledIndexRef = useRef(0);
+    
+    useEffect(() => {
+        if (hidden) {
+            sheetRef.current?.close();
+        } else {
+            sheetRef.current?.snapToIndex(
+                currentIndexRef.current
+            );
+        }
+    }, [hidden]);
 
-    const animatedBackdropStyle =
-        useAnimatedStyle(() => ({
+    const animatedBackdropStyle = useAnimatedStyle(() => {
+        return {
             opacity: interpolate(
                 animatedIndex.value,
-                [0, 1],
+                [1, 2],
                 [0, 1]
             ),
-        }));
+        };
+    });
 
     const handlePress = () => {
-        sheetRef.current?.snapToIndex(
-            currentIndexRef.current === 0
-                ? 1
-                : 0
-        );
+        const nextIndex =
+            currentIndexRef.current <= 1 ? 2 : 1;
+
+        sheetRef.current?.snapToIndex(nextIndex);
     };
 
     return (
@@ -69,11 +72,22 @@ export default function MapSheet() {
                 index={0}
                 snapPoints={snapPoints}
                 enableDynamicSizing={false}
-                enablePanDownToClose={false}
+                enablePanDownToClose={hidden}
                 animateOnMount
                 onChange={(index) => {
-                    currentIndexRef.current = index;
+                    if (index >= 0) {
+                        currentIndexRef.current = index;
+                        setSheetIndex(index);
+                    }
                 }}
+                handleIndicatorStyle={styles.handle}
+                backgroundStyle={[
+                    styles.background,
+                    {
+                        backgroundColor:
+                            theme.colors.secondaryBackground,
+                    },
+                ]}
                 handleComponent={() => (
                     <Pressable
                         onPress={handlePress}
@@ -82,24 +96,13 @@ export default function MapSheet() {
                         <View style={styles.handle} />
                     </Pressable>
                 )}
-                backgroundStyle={[
-                    styles.background,
-                    {
-                        backgroundColor:
-                            theme.colors.secondaryBackground,
-                    },
-                ]}
             >
-                <BottomSheetScrollView
-                    contentContainerStyle={
-                        styles.content
-                    }
-                >
-                    <MapTabBar
-                        selectedTab={selectedTab}
-                        onSelect={setSelectedTab}
-                    />
-                </BottomSheetScrollView>
+                <Places     
+                    sheetIndex={sheetIndex}
+                    expandSheet={() => {
+                        sheetRef.current?.snapToIndex(1);
+                    }}>
+                </Places>
             </BottomSheet>
         </>
     );
@@ -110,44 +113,13 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         backgroundColor: "rgba(0,0,0,0.25)",
     },
-
     background: {
-        borderTopLeftRadius: 32,
-        borderTopRightRadius: 32,
-    },
-
-    header: {
-        alignItems: "center",
-        paddingTop: 8,
-        paddingBottom: 8,
-    },
-
-    pill: {
-        minHeight: 44,
-
-        paddingHorizontal: 20,
-
-        borderRadius: 22,
-
-        alignItems: "center",
-        justifyContent: "center",
-
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-
-        elevation: 4,
-    },
-
-    content: {
-        paddingBottom: 150,
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
     },
     handleContainer: {
         alignItems: "center",
-        paddingVertical: 12,
+        paddingTop: 12,
     },
     handle: {
         width: 36,

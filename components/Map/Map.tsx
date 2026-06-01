@@ -1,4 +1,3 @@
-import { IOS_SYMBOLS } from "@/helpers/savedLocationIcons";
 import { useMapSheetStore } from "@/stores/mapSheetStore";
 import { useMapStore } from "@/stores/mapStore";
 import { useSavedLocationStore } from "@/stores/savedLocationStore";
@@ -9,7 +8,6 @@ import { Pressable, StyleSheet, View } from "react-native";
 import MapView, { MapType, Marker } from "react-native-maps";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import CoinFlipButton from "../Shared/CoinFlipButton";
-import FloatingPillTabBar from "../Shared/FloatingPillTabBar";
 import MapTypeModal from "./modal/MapTypeModal";
 
 type BaseType = "explore" | "satellite";
@@ -41,8 +39,13 @@ export default function Map() {
 
     const buttonOpacity = useSharedValue(pickerVisible ? 0 : 1);
 
+
     useEffect(() => {
-        buttonOpacity.value = withTiming(pickerVisible ? 0 : 1, { duration: 400 });
+        if (pickerVisible) {
+            buttonOpacity.value = withTiming(0, { duration: 400 });
+        } else {
+            buttonOpacity.value = withTiming(1, { duration: 400 });
+        }
     }, [pickerVisible]);
 
     const buttonStyle = useAnimatedStyle(() => ({
@@ -96,9 +99,26 @@ export default function Map() {
 		);
 	};
 
+    // useEffect(() => {
+    //     const test = async () => {
+    //         try {
+    //             const { AppleSearchModule } = NativeModules;
+
+    //             const result = await AppleSearchModule.search("Trader Joe's");
+
+    //             console.log("RESULT", result);
+    //         } catch (error) {
+    //             console.log("ERROR", error);
+    //         }
+    //     };
+
+    //     test();
+    // }, []);
+
     return (
         <View style={styles.container}>
             <MapView
+                mapPadding={{ bottom: 110, top: 0, left: 0, right: 0 }}
                 style={styles.map}
                 mapType={mapType.type}
                 ref={mapRef}
@@ -143,7 +163,7 @@ export default function Map() {
                             <SymbolView
                                 tintColor={theme.colors.primaryText}
                                 type="hierarchical"
-                                name={IOS_SYMBOLS[location.icon]}
+                                name={location.icon}
                                 size={20}
                             />
                         </View>
@@ -177,8 +197,6 @@ export default function Map() {
 
             </Animated.View>
 
-            <FloatingPillTabBar></FloatingPillTabBar>
-
             {pickerVisible && <MapTypeModal />}
 
             {/* {cameraStats && (
@@ -196,22 +214,18 @@ const styles = StyleSheet.create({
     map: { ...StyleSheet.absoluteFillObject },
     buttonStack: {
         position: "absolute",
-        bottom: 100,
+        bottom: 160,
         right: 16,
         gap: 10,
         alignItems: "center",
     },
     button: {
-        width: 42,
-        height: 42,
-        borderRadius: 21,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         overflow: "hidden",
         alignItems: "center",
         justifyContent: "center",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
-        shadowRadius: 6,
     },
     buttonLabel: {
         fontSize: 13,

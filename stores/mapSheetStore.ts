@@ -11,7 +11,7 @@ type MapSheetStore = {
 
 export const useMapSheetStore =
     create<MapSheetStore>((set) => ({
-        selectedTab: "explore",
+        selectedTab: "places",
 
         setSelectedTab: (selectedTab) =>
             set({ selectedTab }),

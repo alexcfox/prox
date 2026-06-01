@@ -19,24 +19,7 @@ type SavedLocationStore = {
 
 export const useSavedLocationStore =
     create<SavedLocationStore>((set) => ({
-        savedLocations: [
-            {
-                id: "1",
-
-                label: "Alex's Job",
-
-                name: "Google",
-
-                address: "Irvine, CA",
-
-                coordinate: {
-                    latitude: 33.6846,
-                    longitude: -117.8265,
-                },
-
-                icon: "briefcase",
-            },
-        ],
+        savedLocations: [],
 
         addSavedLocation: (location) =>
             set((state) => ({

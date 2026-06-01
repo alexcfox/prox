@@ -1,37 +1,34 @@
-// components/FloatingPillTabBar.tsx
-import { ReactNativeIosTabBarView, TabItem } from '@/modules/react-native-ios-tab-bar/src';
 import { useTheme } from '@/theme/theme';
+import { SymbolViewProps } from 'expo-symbols';
 import React, { useState } from 'react';
-import { useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View } from 'react-native';
+import TabView from 'react-native-bottom-tabs';
 
-const TABS: TabItem[] = [
-    { label: 'Home',    symbol: 'house' },
-    { label: 'Search',  symbol: 'magnifyingglass' },
-    { label: 'Saved',   symbol: 'heart' },
-    { label: 'Profile', symbol: 'person' },
+type SFSymbol = SymbolViewProps['name'];
+
+const renderScene = () => null;
+
+const ROUTES = [
+    { key: 'places',    title: 'Places',    focusedIcon: { sfSymbol: 'mappin.and.ellipse' as SFSymbol } },
+    { key: 'preferences',  title: 'Preferences',  focusedIcon: { sfSymbol: 'slider.horizontal.3' as SFSymbol } },
+    { key: 'financial',   title: 'Financials',   focusedIcon: { sfSymbol: 'dollarsign.circle.fill' as SFSymbol } },
+    { key: 'favorites', title: 'Favorites', focusedIcon: { sfSymbol: 'heart.fill' as SFSymbol } },
 ];
 
 export default function FloatingPillTabBar() {
     const theme = useTheme();
-    const { bottom } = useSafeAreaInsets();
-    const { width } = useWindowDimensions();
     const [activeTab, setActiveTab] = useState(0);
 
     return (
-        <ReactNativeIosTabBarView
-            tabs={TABS}
-            activeIndex={activeTab}
-            tintColor={theme.colors.accent}
-            onTabChange={(e) => setActiveTab(e.nativeEvent.index)}
-            style={{
-                position: 'absolute',
-                bottom: bottom,
-                left: 0,
-                right: 0,
-                width: width,
-                height: 80,
-            }}
-        />
+        <View style={{ height: 83, backgroundColor: theme.colors.secondaryBackground }}>
+            <TabView
+                navigationState={{ index: activeTab, routes: ROUTES }}
+                renderScene={() => null}
+                onIndexChange={setActiveTab}
+                sidebarAdaptable
+                tabBarActiveTintColor={theme.colors.accent}
+                tabBarStyle={{ backgroundColor: theme.colors.secondaryBackground }}
+            />
+        </View>
     );
 }

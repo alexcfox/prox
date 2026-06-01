@@ -13,13 +13,14 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
+  "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.prox",
+      "deploymentTarget": "17.0",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Your location is used to show your position on the map."
+          "NSLocationWhenInUseUsageDescription": "Your location is used to show your position on the map."
       }
-    },
+  },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",

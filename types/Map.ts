@@ -22,7 +22,7 @@ export interface MapMarker {
 }
 
 export type MapTab =
-    | "explore"
+    | "places"
     | "preferences"
     | "financials"
     | "favorites";
