@@ -3,56 +3,65 @@ import React
 import MapKit
 
 @objc(AppleSearchModule)
-class AppleSearchModule: NSObject, MKLocalSearchCompleterDelegate {
+class AppleSearchModule: RCTEventEmitter, MKLocalSearchCompleterDelegate {
 
     private var completer: MKLocalSearchCompleter!
-    private var pendingResolve: RCTPromiseResolveBlock?
-    private var pendingReject: RCTPromiseRejectBlock?
-    private var timeoutTimer: Timer?
 
     override init() {
         super.init()
-        completer = MKLocalSearchCompleter()
-        completer.delegate = self
-        completer.resultTypes = [.address, .pointOfInterest]
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.completer = MKLocalSearchCompleter()
+            self.completer.delegate = self
+            self.completer.resultTypes = [.address, .pointOfInterest]
+        }
     }
 
-    @objc
-    static func requiresMainQueueSetup() -> Bool {
+    override static func requiresMainQueueSetup() -> Bool {
         return true
     }
 
-    @objc
-    func hello(
-        _ resolve: RCTPromiseResolveBlock,
-        rejecter reject: RCTPromiseRejectBlock
-    ) {
-        resolve("Hello from Swift")
+    override func supportedEvents() -> [String]! {
+        return ["searchResults"]
     }
 
     @objc
-    func search(
-        _ query: String,
-        resolver resolve: @escaping RCTPromiseResolveBlock,
-        rejecter reject: @escaping RCTPromiseRejectBlock
-    ) {
-        cancelPending()
-
-        pendingResolve = resolve
-        pendingReject = reject
-
+    func startSearch(_ query: String) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-
-            self.timeoutTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: false) { [weak self] _ in
-                self?.pendingReject?("TIMEOUT", "Search timed out", nil)
-                self?.pendingResolve = nil
-                self?.pendingReject = nil
+            if query.trimmingCharacters(in: .whitespaces).isEmpty {
+                self.sendEvent(withName: "searchResults", body: [])
+                return
             }
-
             self.completer.queryFragment = query
         }
     }
+
+    @objc
+    func clearSearch() {
+        DispatchQueue.main.async { [weak self] in
+            self?.completer.queryFragment = ""
+        }
+    }
+
+    // MARK: - MKLocalSearchCompleterDelegate
+
+    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        let results = completer.results.map { result in
+            [
+                "title": result.title,
+                "subtitle": result.subtitle
+            ]
+        }
+        sendEvent(withName: "searchResults", body: results)
+    }
+
+    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+        print("🔴 completer error:", error)
+        sendEvent(withName: "searchResults", body: [])
+    }
+
+    // MARK: - Resolve (keeps promise pattern, one-shot is fine here)
 
     @objc
     func resolve(
@@ -96,46 +105,5 @@ class AppleSearchModule: NSObject, MKLocalSearchCompleterDelegate {
                 resolve(result)
             }
         }
-    }
-
-    // MARK: - MKLocalSearchCompleterDelegate
-
-    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-        print("🟢 delegate fired, result count:", completer.results.count)
-
-        timeoutTimer?.invalidate()
-        timeoutTimer = nil
-
-        let results = completer.results.map { result in
-            [
-                "title": result.title,
-                "subtitle": result.subtitle
-            ]
-        }
-
-        pendingResolve?(results)
-        pendingResolve = nil
-        pendingReject = nil
-    }
-
-    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
-        print("🔴 completer error:", error)
-
-        timeoutTimer?.invalidate()
-        timeoutTimer = nil
-
-        pendingReject?("SEARCH_ERROR", error.localizedDescription, error)
-        pendingResolve = nil
-        pendingReject = nil
-    }
-
-    // MARK: - Helpers
-
-    private func cancelPending() {
-        timeoutTimer?.invalidate()
-        timeoutTimer = nil
-        pendingResolve?([])
-        pendingResolve = nil
-        pendingReject = nil
     }
 }
