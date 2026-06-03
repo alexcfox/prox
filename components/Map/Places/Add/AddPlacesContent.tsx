@@ -1,92 +1,52 @@
 import { useAppleSearch } from "@/hooks/useAppleSearch";
-import { useSavedLocationStore } from "@/stores/savedLocationStore";
+import { usePlacesSheetStore } from "@/stores/placesSheetStore";
+import { milesToMeters, useTargetLocationStore } from "@/stores/targetLocationStore";
 import { useTheme } from "@/theme/theme";
-import { iconForPOICategory, parsePOICategory, SavedLocation, SavedLocationIcon } from "@/types/SavedLocation";
+import { ALL_ICONS, iconForPOICategory, parsePOICategory, ResolvedLocation, SavedLocation } from "@/types/SavedLocation";
 import { SymbolView } from "expo-symbols";
-import React, { useState } from "react";
+import React from "react";
 import {
-    ActivityIndicator,
-    NativeModules,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+	ActivityIndicator,
+	Keyboard,
+	NativeModules,
+	Pressable,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View
 } from "react-native";
 
-interface ResolvedLocation {
-	name: string;
-	address: string;
-	latitude: number;
-	longitude: number;
-	phoneNumber: string;
-	url: string;
-	pointOfInterestCategory: string;
-	street: string;
-	city: string;
-	state: string;
-	zip: string;
-	country: string;
-	countryCode: string;
-}
-
-const PERSONAL_ICONS: { label: string; icon: SavedLocationIcon }[] = [
-	{ label: "Work",     icon: "briefcase.fill" },
-	{ label: "Home",     icon: "house.fill" },
-	{ label: "School",   icon: "graduationcap.fill" },
-	{ label: "Friend",   icon: "person.fill" },
-	{ label: "Family",   icon: "figure.2.and.child.holdinghands" },
-	{ label: "Gym",      icon: "dumbbell.fill" },
-	{ label: "Doctor",   icon: "stethoscope" },
-	{ label: "Favorite", icon: "heart.fill" },
-	{ label: "Star",     icon: "star.fill" },
-	{ label: "Pin",      icon: "mappin" },
-];
-
-const POI_ICONS: { label: string; icon: SavedLocationIcon }[] = [
-	{ label: "Restaurant",   icon: "fork.knife" },
-	{ label: "Cafe",         icon: "cup.and.saucer.fill" },
-	{ label: "Bar",          icon: "mug.fill" },
-	{ label: "Grocery",      icon: "cart.fill" },
-	{ label: "Park",         icon: "leaf.fill" },
-	{ label: "Hospital",     icon: "cross.fill" },
-	{ label: "Pharmacy",     icon: "pills.fill" },
-	{ label: "Gas",          icon: "fuelpump.fill" },
-	{ label: "EV",           icon: "bolt.car.fill" },
-	{ label: "Parking",      icon: "parkingsign" },
-	{ label: "Transit",      icon: "tram.fill" },
-	{ label: "Airport",      icon: "airplane" },
-	{ label: "Hotel",        icon: "bed.double.fill" },
-	{ label: "Museum",       icon: "building.columns.fill" },
-	{ label: "Theater",      icon: "theatermasks.fill" },
-	{ label: "Movie",        icon: "film.fill" },
-	{ label: "Stadium",      icon: "sportscourt.fill" },
-	{ label: "Beach",        icon: "beach.umbrella.fill" },
-	{ label: "Campground",   icon: "tent.fill" },
-	{ label: "Nature",       icon: "tree.fill" },
-	{ label: "Library",      icon: "books.vertical.fill" },
-	{ label: "Bank",         icon: "building.columns.fill" },
-	{ label: "ATM",          icon: "banknote.fill" },
-	{ label: "Store",        icon: "bag.fill" },
-	{ label: "Laundry",      icon: "washer.fill" },
-	{ label: "Marina",       icon: "sailboat.fill" },
-	{ label: "Nightlife",    icon: "music.note" },
-	{ label: "Zoo",          icon: "pawprint.fill" },
-	{ label: "Aquarium",     icon: "fish.fill" },
-];
-
-const ALL_ICONS = [...PERSONAL_ICONS, ...POI_ICONS];
+const { AppleSearchModule } = NativeModules;
 
 export default function AddPlacesContent() {
 	const theme = useTheme();
-	const { addSavedLocation } = useSavedLocationStore();
-	const { query, results, search } = useAppleSearch();
+	const { targetLocation } = useTargetLocationStore();
 
-	const [resolving, setResolving] = useState(false);
-	const [pending, setPending] = useState<SavedLocation | null>(null);
-	const [label, setLabel] = useState("");
-	const [selectedIcon, setSelectedIcon] = useState<SavedLocationIcon>("mappin");
+	const region = targetLocation
+		? {
+			latitude: targetLocation.latitude,
+			longitude: targetLocation.longitude,
+			radiusMiles: targetLocation.radiusMiles,
+		}
+		: null;
+
+	const { query, results, search } = useAppleSearch(region);
+	const {
+		pendingSavedLocation,
+		label,
+		selectedIcon,
+		showIncludeAll,
+		includeAllLocations,
+		setPendingSavedLocation,
+		setLabel,
+		setSelectedIcon,
+		setShowIncludeAll,
+		setIncludeAllLocations,
+		setDuplicateLocations,
+	} = usePlacesSheetStore();
+
+	const [resolving, setResolving] = React.useState(false);
 
 	const handleChange = (text: string) => {
 		search(text);
@@ -94,8 +54,11 @@ export default function AddPlacesContent() {
 
 	const handleSelect = async (item: { title: string; subtitle: string }) => {
 		setResolving(true);
+		setShowIncludeAll(false);
+		setIncludeAllLocations(false);
+		setDuplicateLocations([]);
+
 		try {
-			const { AppleSearchModule } = NativeModules;
 			const raw: ResolvedLocation = await AppleSearchModule.resolve(item.title, item.subtitle);
 
 			const poiCategory = parsePOICategory(raw.pointOfInterestCategory);
@@ -122,9 +85,12 @@ export default function AddPlacesContent() {
 				icon,
 			};
 
-			setPending(location);
-			setLabel(location.label);
-			setSelectedIcon(icon);
+			setPendingSavedLocation(location);
+			search("");
+
+			if (targetLocation) {
+				checkForDuplicates(raw.name, targetLocation.latitude, targetLocation.longitude, targetLocation.radiusMiles);
+			}
 		} catch (e) {
 			console.error("Resolve error:", e);
 		} finally {
@@ -132,32 +98,79 @@ export default function AddPlacesContent() {
 		}
 	};
 
-	const handleConfirm = () => {
-		if (!pending) return;
-		addSavedLocation({ ...pending, label, icon: selectedIcon });
-		setPending(null);
-		search("");
+	const checkForDuplicates = async (
+		name: string,
+		latitude: number,
+		longitude: number,
+		radiusMiles: number
+	) => {
+		try {
+			const results: ResolvedLocation[] =
+				await AppleSearchModule.searchByName(
+					name,
+					latitude,
+					longitude,
+					milesToMeters(radiusMiles)
+				);
+
+			const matches = results.filter((r) => {
+				if (r.name?.toLowerCase() !== name.toLowerCase()) {
+					return false;
+				}
+
+				return (
+					getDistanceMiles(
+						latitude,
+						longitude,
+						r.latitude,
+						r.longitude
+					) <= radiusMiles
+				);
+			});
+
+			setDuplicateLocations(matches);
+			setShowIncludeAll(matches.length > 1);
+		} catch (e) {
+			console.error("Duplicate check error:", e);
+			setShowIncludeAll(false);
+		}
 	};
 
-	const handleBack = () => {
-		setPending(null);
-	};
+	function getDistanceMiles(
+		lat1: number,
+		lon1: number,
+		lat2: number,
+		lon2: number
+	) {
+		const R = 3958.8;
+
+		const dLat = ((lat2 - lat1) * Math.PI) / 180;
+		const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+		const a =
+			Math.sin(dLat / 2) ** 2 +
+			Math.cos((lat1 * Math.PI) / 180) *
+			Math.cos((lat2 * Math.PI) / 180) *
+			Math.sin(dLon / 2) ** 2;
+
+		var distanceInMiles = R *
+			(2 *
+				Math.atan2(
+					Math.sqrt(a),
+					Math.sqrt(1 - a)
+				));
+
+		console.log(distanceInMiles);
+		return (
+			distanceInMiles
+		);
+	}
 
 	// ─── Confirm View ─────────────────────────────────────────────────────────
-	if (pending) {
+	if (pendingSavedLocation) {
 		return (
 			<View style={[styles.container, { backgroundColor: theme.colors.secondaryBackground }]}>
-				<View style={styles.confirmHeader}>
-					<TouchableOpacity onPress={handleBack}>
-						<Text style={[styles.backButton, { color: theme.colors.accent }]}>← Back</Text>
-					</TouchableOpacity>
-					<Text style={[styles.confirmTitle, { color: theme.colors.primaryText }]}>Add Place</Text>
-					<TouchableOpacity onPress={handleConfirm}>
-						<Text style={[styles.saveButton, { color: theme.colors.accent }]}>Save</Text>
-					</TouchableOpacity>
-				</View>
-
-				<ScrollView contentContainerStyle={styles.confirmScroll} showsVerticalScrollIndicator={false}>
+				<View style={styles.confirmContainer}>
 					<View style={[styles.previewCard, { backgroundColor: theme.colors.background }]}>
 						<View style={[styles.previewIcon, { backgroundColor: theme.colors.mutedBackground }]}>
 							<SymbolView
@@ -169,13 +182,44 @@ export default function AddPlacesContent() {
 						</View>
 						<View style={styles.previewText}>
 							<Text style={[styles.previewName, { color: theme.colors.primaryText }]} numberOfLines={1}>
-								{label || pending.name}
+								{label || pendingSavedLocation.name}
 							</Text>
 							<Text style={[styles.previewAddress, { color: theme.colors.secondaryText }]} numberOfLines={1}>
-								{pending.address}
+								{pendingSavedLocation.address}
 							</Text>
 						</View>
 					</View>
+
+					{showIncludeAll && (
+						<Pressable
+							onPress={() => setIncludeAllLocations(!includeAllLocations)}
+							style={[
+								styles.includeAllContainer,
+								{ backgroundColor: theme.colors.secondaryBackground },
+							]}
+						>
+							<View
+								style={[
+									styles.checkbox,
+									{
+										borderColor: includeAllLocations
+											? theme.colors.accent
+											: theme.colors.secondaryText,
+										backgroundColor: includeAllLocations
+											? theme.colors.accent
+											: "transparent",
+									},
+								]}
+							>
+								{includeAllLocations && (
+									<Text style={styles.checkmark}>✓</Text>
+								)}
+							</View>
+							<Text style={[styles.includeAllText, { color: theme.colors.primaryText }]}>
+								Include all {pendingSavedLocation.name} locations
+							</Text>
+						</Pressable>
+					)}
 
 					<Text style={[styles.sectionHeader, { color: theme.colors.secondaryText }]}>LABEL</Text>
 					<View style={[styles.inputCard, { backgroundColor: theme.colors.background }]}>
@@ -200,7 +244,10 @@ export default function AddPlacesContent() {
 										styles.iconCell,
 										selected && { backgroundColor: theme.colors.mutedBackground }
 									]}
-									onPress={() => setSelectedIcon(icon)}
+									onPress={() => {
+										setSelectedIcon(icon);
+										Keyboard.dismiss();
+									}}
 								>
 									<SymbolView
 										name={icon}
@@ -218,14 +265,14 @@ export default function AddPlacesContent() {
 							);
 						})}
 					</View>
-				</ScrollView>
+				</View>
 			</View>
 		);
 	}
 
 	// ─── Search View ──────────────────────────────────────────────────────────
 	return (
-		<View style={[styles.container, { backgroundColor: theme.colors.secondaryBackground }]}>
+		<View style={styles.searchContainer}>
 			<View style={[styles.searchBar, { backgroundColor: theme.colors.background }]}>
 				<TextInput
 					style={[styles.input, { color: theme.colors.primaryText }]}
@@ -241,21 +288,25 @@ export default function AddPlacesContent() {
 				)}
 			</View>
 
-			{results.map((item, i) => (
-				<View key={i}>
-					<TouchableOpacity style={styles.row} onPress={() => handleSelect(item)}>
-						<Text style={[styles.title, { color: theme.colors.primaryText }]} numberOfLines={1}>
-							{item.title}
-						</Text>
-						<Text style={[styles.subtitle, { color: theme.colors.secondaryText }]} numberOfLines={1}>
-							{item.subtitle}
-						</Text>
-					</TouchableOpacity>
-					{i < results.length - 1 && (
-						<View style={[styles.separator, { backgroundColor: theme.colors.border }]} />
-					)}
+			{results.length > 0 && (
+				<View style={[styles.resultsContainer, { backgroundColor: theme.colors.background }]}>
+					{results.map((item, i) => (
+						<View key={i}>
+							<TouchableOpacity style={styles.row} onPress={() => handleSelect(item)}>
+								<Text style={[styles.title, { color: theme.colors.primaryText }]} numberOfLines={1}>
+									{item.title}
+								</Text>
+								<Text style={[styles.subtitle, { color: theme.colors.secondaryText }]} numberOfLines={1}>
+									{item.subtitle}
+								</Text>
+							</TouchableOpacity>
+							{i < results.length - 1 && (
+								<View style={[styles.separator, { backgroundColor: theme.colors.border }]} />
+							)}
+						</View>
+					))}
 				</View>
-			))}
+			)}
 		</View>
 	);
 }
@@ -264,10 +315,19 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 	},
+	searchContainer: {
+		paddingHorizontal: 12,
+		paddingTop: 8,
+		paddingBottom: 4,
+	},
+	confirmContainer: {
+		paddingHorizontal: 12,
+		paddingTop: 8,
+		paddingBottom: 4,
+	},
 	searchBar: {
 		flexDirection: "row",
 		alignItems: "center",
-		margin: 12,
 		paddingHorizontal: 12,
 		borderRadius: 10,
 		height: 44,
@@ -278,6 +338,11 @@ const styles = StyleSheet.create({
 	},
 	spinner: {
 		marginLeft: 8,
+	},
+	resultsContainer: {
+		marginTop: 4,
+		borderRadius: 10,
+		overflow: "hidden",
 	},
 	row: {
 		paddingHorizontal: 16,
@@ -295,34 +360,12 @@ const styles = StyleSheet.create({
 		height: StyleSheet.hairlineWidth,
 		marginLeft: 16,
 	},
-	confirmHeader: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-		paddingHorizontal: 16,
-		paddingVertical: 12,
-	},
-	backButton: {
-		fontSize: 16,
-	},
-	confirmTitle: {
-		fontSize: 16,
-		fontWeight: "600",
-	},
-	saveButton: {
-		fontSize: 16,
-		fontWeight: "600",
-	},
-	confirmScroll: {
-		paddingHorizontal: 16,
-		paddingBottom: 40,
-	},
 	previewCard: {
 		flexDirection: "row",
 		alignItems: "center",
 		borderRadius: 12,
 		padding: 14,
-		marginBottom: 24,
+		marginBottom: 10,
 		gap: 12,
 	},
 	previewIcon: {
@@ -376,5 +419,32 @@ const styles = StyleSheet.create({
 	iconLabel: {
 		fontSize: 10,
 		textAlign: "center",
+	},
+	includeAllContainer: {
+		marginBottom: 10,
+		flexDirection: "row",
+		alignItems: "center",
+		paddingHorizontal: 12,
+		paddingVertical: 10,
+		borderRadius: 10,
+	},
+	checkbox: {
+		width: 20,
+		height: 20,
+		borderRadius: 4,
+		borderWidth: 1.5,
+		alignItems: "center",
+		justifyContent: "center",
+		marginRight: 10,
+	},
+	checkmark: {
+		color: "white",
+		fontSize: 12,
+		fontWeight: "600",
+	},
+	includeAllText: {
+		fontSize: 13,
+		fontWeight: "500",
+		flex: 1,
 	},
 });

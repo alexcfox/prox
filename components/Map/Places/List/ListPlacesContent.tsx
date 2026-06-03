@@ -1,20 +1,21 @@
 import PlaceRow from "@/components/PlaceRow";
 import AnimatedDivider from "@/components/Shared/AnimatedDivider";
 import { useTheme } from "@/theme/theme";
+import { SavedLocationGroup } from "@/types/SavedLocation";
 import { SymbolView } from "expo-symbols";
 import React, { Fragment } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 type Props = {
-    savedLocations: any[];
-    removeSavedLocation: (id: string) => void;
+    savedLocationGroups: SavedLocationGroup[];
+    removeSavedLocationGroup: (id: string) => void;
     swipingId: string | null;
     setSwipingId: (id: string | null) => void;
 };
 
 export default function ListPlacesContent({
-    savedLocations,
-    removeSavedLocation,
+    savedLocationGroups,
+    removeSavedLocationGroup,
     swipingId,
     setSwipingId,
 }: Props) {
@@ -22,7 +23,7 @@ export default function ListPlacesContent({
 
     return (
         <>
-            {savedLocations.length === 0 ? (
+            {savedLocationGroups.length === 0 ? (
                 <View style={styles.emptyState}>
                     <View
                         style={[
@@ -57,29 +58,30 @@ export default function ListPlacesContent({
                 </View>
             ) : (
                 <View style={styles.placesList}>
-                    {savedLocations.map((location, index) => {
-                        const next = savedLocations[index + 1];
+                    {savedLocationGroups.map((group, index) => {
+                        const next = savedLocationGroups[index + 1];
 
                         const hideDivider =
-                            swipingId === location.id ||
+                            swipingId === group.id ||
                             swipingId === next?.id;
 
                         return (
-                            <Fragment key={location.id}>
+                            <Fragment key={group.id}>
                                 <PlaceRow
-                                    location={location}
+                                    group={group}
+                                    onPress={() => console.log(group.locations)}
                                     onDelete={() =>
-                                        removeSavedLocation(location.id)
+                                        removeSavedLocationGroup(group.id)
                                     }
                                     onSwipeStart={() =>
-                                        setSwipingId(location.id)
+                                        setSwipingId(group.id)
                                     }
                                     onSwipeEnd={() =>
                                         setSwipingId(null)
                                     }
                                 />
 
-                                {index < savedLocations.length - 1 && (
+                                {index < savedLocationGroups.length - 1 && (
                                     <AnimatedDivider
                                         hidden={hideDivider}
                                         color={theme.colors.divider}
@@ -93,7 +95,6 @@ export default function ListPlacesContent({
         </>
     );
 }
-
 
 const styles = StyleSheet.create({
     placesList: {

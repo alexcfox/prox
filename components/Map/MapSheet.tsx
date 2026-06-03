@@ -1,7 +1,7 @@
 import { useTheme } from "@/theme/theme";
 import BottomSheet from "@gorhom/bottom-sheet";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Keyboard, Pressable, StyleSheet, View } from "react-native";
 import Animated, {
     interpolate,
     useAnimatedStyle,
@@ -50,10 +50,7 @@ export default function MapSheet({ hidden }: Props) {
     });
 
     const handlePress = () => {
-        const nextIndex =
-            currentIndexRef.current <= 1 ? 2 : 1;
-
-        sheetRef.current?.snapToIndex(nextIndex);
+        sheetRef.current?.snapToIndex(1);
     };
 
     return (
@@ -73,11 +70,21 @@ export default function MapSheet({ hidden }: Props) {
                 snapPoints={snapPoints}
                 enableDynamicSizing={false}
                 enablePanDownToClose={hidden}
+                keyboardBlurBehavior="restore"
+                keyboardBehavior="interactive"
                 animateOnMount
+                onAnimate={(fromIndex, toIndex) => {
+                    if (toIndex === 0) {
+                        Keyboard.dismiss();
+                    }
+                }}
                 onChange={(index) => {
                     if (index >= 0) {
                         currentIndexRef.current = index;
                         setSheetIndex(index);
+                    }
+                    if (index === 0) {
+                        Keyboard.dismiss();
                     }
                 }}
                 handleIndicatorStyle={styles.handle}
@@ -97,11 +104,7 @@ export default function MapSheet({ hidden }: Props) {
                     </Pressable>
                 )}
             >
-                <Places     
-                    sheetIndex={sheetIndex}
-                    expandSheet={() => {
-                        sheetRef.current?.snapToIndex(1);
-                    }}>
+                <Places    sheetIndex={sheetIndex} >
                 </Places>
             </BottomSheet>
         </>

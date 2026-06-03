@@ -28,7 +28,7 @@ export default function Map() {
         setSelectedTab,
     } = useMapSheetStore();
 	
-    const { savedLocations } = useSavedLocationStore();
+    const { getSavedLocations } = useSavedLocationStore();
 
 	const hasInitialRecentered = useRef(false);
 
@@ -38,7 +38,6 @@ export default function Map() {
     const mapType = BASE_MAP[baseType];
 
     const buttonOpacity = useSharedValue(pickerVisible ? 0 : 1);
-
 
     useEffect(() => {
         if (pickerVisible) {
@@ -152,7 +151,7 @@ export default function Map() {
 					}
 				}}
             >
-                {savedLocations.map((location) => (
+                {getSavedLocations().map((location) => (
                     <Marker
                         key={location.id}
                         coordinate={location.coordinate}

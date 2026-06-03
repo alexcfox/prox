@@ -1,4 +1,3 @@
-// PlaceRow.tsx
 import { SymbolView } from "expo-symbols";
 import React, { useCallback, useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -14,14 +13,14 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { useTheme } from "@/theme/theme";
-import { SavedLocation } from "@/types/SavedLocation";
+import { SavedLocationGroup } from "@/types/SavedLocation";
 
 type Props = {
-    location: SavedLocation;
+    group: SavedLocationGroup;
     onPress?: () => void;
     onDelete?: () => void;
     onSwipeStart?: () => void;
-    onSwipeEnd?: () => void
+    onSwipeEnd?: () => void;
 };
 
 type RightActionsProps = {
@@ -32,31 +31,47 @@ type RightActionsProps = {
 function DeleteAction({ dragX, onDelete }: RightActionsProps) {
     const animatedStyle = useAnimatedStyle(() => {
         const dragAmount = Math.abs(dragX.value);
+
         const scale = interpolate(
             dragAmount,
             [0, 88, 120],
             [0.5, 1, 1.3],
             Extrapolation.CLAMP
         );
+
         const opacity = interpolate(
             dragAmount,
             [0, 44],
             [0, 1],
             Extrapolation.CLAMP
         );
-        return { transform: [{ scale }], opacity };
+
+        return {
+            transform: [{ scale }],
+            opacity,
+        };
     });
 
     return (
         <Pressable style={styles.deleteAction} onPress={onDelete}>
             <Animated.View style={[styles.deleteIconContainer, animatedStyle]}>
-                <SymbolView name="trash.fill" size={20} tintColor="white" />
+                <SymbolView
+                    name="trash.fill"
+                    size={20}
+                    tintColor="white"
+                />
             </Animated.View>
         </Pressable>
     );
 }
 
-export default function PlaceRow({ location, onPress, onDelete, onSwipeEnd, onSwipeStart }: Props) {
+export default function PlaceRow({
+    group,
+    onPress,
+    onDelete,
+    onSwipeEnd,
+    onSwipeStart,
+}: Props) {
     const theme = useTheme();
     const [isSwiping, setIsSwiping] = useState(false);
 
@@ -87,6 +102,8 @@ export default function PlaceRow({ location, onPress, onDelete, onSwipeEnd, onSw
         ),
     }));
 
+    const locationCount = group.locations.length;
+
     return (
         <Swipeable
             renderRightActions={renderRightActions}
@@ -102,15 +119,21 @@ export default function PlaceRow({ location, onPress, onDelete, onSwipeEnd, onSw
             }}
         >
             <Animated.View style={[animatedRowStyle, styles.rowContainer]}>
-                <Pressable style={styles.container} onPress={onPress}>
+                <Pressable
+                    style={styles.container}
+                    onPress={onPress}
+                >
                     <View
                         style={[
                             styles.iconContainer,
-                            { backgroundColor: theme.colors.background },
+                            {
+                                backgroundColor:
+                                    theme.colors.background,
+                            },
                         ]}
                     >
                         <SymbolView
-                            name={location.icon}
+                            name={group.icon}
                             size={24}
                             tintColor={theme.colors.primaryText}
                         />
@@ -123,18 +146,23 @@ export default function PlaceRow({ location, onPress, onDelete, onSwipeEnd, onSw
                                 { color: theme.colors.primaryText },
                             ]}
                         >
-                            {location.label}
+                            {group.label}
                         </Text>
 
-                        <Text
-                            numberOfLines={1}
-                            style={[
-                                styles.subtitle,
-                                { color: theme.colors.secondaryText },
-                            ]}
-                        >
-                            {location.name}
-                        </Text>
+                        {locationCount > 1 && (
+                            <Text
+                                numberOfLines={1}
+                                style={[
+                                    styles.subtitle,
+                                    {
+                                        color:
+                                            theme.colors.secondaryText,
+                                    },
+                                ]}
+                            >
+                                {locationCount} locations
+                            </Text>
+                        )}
                     </View>
                 </Pressable>
             </Animated.View>

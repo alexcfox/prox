@@ -1,49 +1,67 @@
-import { SavedLocation } from "@/types/SavedLocation";
+import { SavedLocation, SavedLocationGroup } from "@/types/SavedLocation";
 import { create } from "zustand";
 
 type SavedLocationStore = {
-    savedLocations: SavedLocation[];
+    savedLocationGroups: SavedLocationGroup[];
 
-    addSavedLocation: (
-        location: SavedLocation
+    addSavedLocationGroup: (
+        group: SavedLocationGroup
     ) => void;
 
-    updateSavedLocation: (
-        location: SavedLocation
+    updateSavedLocationGroup: (
+        group: SavedLocationGroup
     ) => void;
 
-    removeSavedLocation: (
+    removeSavedLocationGroup: (
         id: string
     ) => void;
+
+    getSavedLocations: () => SavedLocation[];
+
+    getLocationCount: () => number;
 };
 
 export const useSavedLocationStore =
-    create<SavedLocationStore>((set) => ({
-        savedLocations: [],
+    create<SavedLocationStore>((set, get) => ({
+        savedLocationGroups: [],
 
-        addSavedLocation: (location) =>
+        addSavedLocationGroup: (group) =>
             set((state) => ({
-                savedLocations: [
-                    ...state.savedLocations,
-                    location,
+                savedLocationGroups: [
+                    ...state.savedLocationGroups,
+                    group,
                 ],
             })),
 
-        updateSavedLocation: (location) =>
+        updateSavedLocationGroup: (group) =>
             set((state) => ({
-                savedLocations:
-                    state.savedLocations.map((sl) =>
-                        sl.id === location.id
-                            ? location
-                            : sl
+                savedLocationGroups:
+                    state.savedLocationGroups.map((g) =>
+                        g.id === group.id
+                            ? group
+                            : g
                     ),
             })),
 
-        removeSavedLocation: (id) =>
+        removeSavedLocationGroup: (id) =>
             set((state) => ({
-                savedLocations:
-                    state.savedLocations.filter(
-                        (sl) => sl.id !== id
+                savedLocationGroups:
+                    state.savedLocationGroups.filter(
+                        (g) => g.id !== id
                     ),
             })),
+
+        getSavedLocations: () =>
+            get()
+                .savedLocationGroups
+                .flatMap((group) => group.locations),
+
+        getLocationCount: () =>
+            get()
+                .savedLocationGroups
+                .reduce(
+                    (count, group) =>
+                        count + group.locations.length,
+                    0
+                ),
     }));

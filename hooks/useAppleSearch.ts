@@ -1,3 +1,4 @@
+import { milesToMeters } from "@/stores/targetLocationStore";
 import { useEffect, useState } from "react";
 import { NativeEventEmitter, NativeModules } from "react-native";
 
@@ -6,12 +7,18 @@ export interface SearchResult {
     subtitle: string;
 }
 
+export interface SearchRegion {
+    latitude: number;
+    longitude: number;
+    radiusMiles: number;
+}
+
 const { AppleSearchModule } = NativeModules;
 const emitter = new NativeEventEmitter(AppleSearchModule);
 
 let debounceTimer: ReturnType<typeof setTimeout>;
 
-export function useAppleSearch() {
+export function useAppleSearch(region: SearchRegion | null) {
     const [results, setResults] = useState<SearchResult[]>([]);
     const [query, setQuery] = useState("");
 
@@ -35,9 +42,19 @@ export function useAppleSearch() {
             return;
         }
 
+        if (!region) {
+            console.warn("useAppleSearch: no region set, skipping search");
+            return;
+        }
+
         debounceTimer = setTimeout(() => {
-            AppleSearchModule.startSearch(text);
-        }, 150); // shorter debounce since no promise overhead
+            AppleSearchModule.startSearch(
+                text,
+                region.latitude,
+                region.longitude,
+                milesToMeters(region.radiusMiles)
+            );
+        }, 150);
     };
 
     return { query, results, search };

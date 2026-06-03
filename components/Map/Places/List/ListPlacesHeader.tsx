@@ -1,19 +1,12 @@
 import { useSavedLocationStore } from "@/stores/savedLocationStore";
 import { useTheme } from "@/theme/theme";
-import { SymbolView } from "expo-symbols";
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-type Props = {
-    setSheetMode: (mode: "list" | "add") => void;
-    sheetIndex: number;
-    expandSheet: () => void;
-};
-
-export default function ListPlacesHeader({ setSheetMode, expandSheet, sheetIndex }: Props) {
+export default function ListPlacesHeader() {
 
     const theme = useTheme();
-    const { savedLocations } = useSavedLocationStore();
+    const { getLocationCount } = useSavedLocationStore();
 
     return (
         <View style={styles.placesHeader}>
@@ -33,30 +26,11 @@ export default function ListPlacesHeader({ setSheetMode, expandSheet, sheetIndex
                         { color: theme.colors.secondaryText }
                     ]}
                 >
-                    {savedLocations.length} {savedLocations.length === 1 ? "Place" : "Places"} Added
+                    {getLocationCount()} {getLocationCount() === 1 ? "Place" : "Places"} Added
 
-                    {savedLocations.length === 0 ? " • Add Your First Place" : ""}
+                    {getLocationCount() === 0 ? " • Add Your First Place" : ""}
                 </Text>
             </View>
-
-            <Pressable
-                style={[
-                    styles.addButton,
-                    { backgroundColor: theme.colors.accent }
-                ]}
-                onPress={() => {
-                    setSheetMode("add");
-                    if (sheetIndex < 1) {
-                        expandSheet();
-                    }
-                }}
-            >
-                <SymbolView
-                    name="plus"
-                    size={20}
-                    tintColor={theme.colors.coloredButtonText}
-                />
-            </Pressable>
         </View>
     );
 }
@@ -82,12 +56,5 @@ const styles = StyleSheet.create({
     placesCount: {
         marginTop: 2,
         fontSize: 14,
-    },
-    addButton: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        justifyContent: "center",
-        alignItems: "center",
     },
 });

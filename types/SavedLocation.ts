@@ -3,6 +3,14 @@ import { Coordinate } from "./Map";
 
 export type SavedLocationIcon = SymbolViewProps["name"];
 
+export interface SavedLocationGroup {
+    id: string;
+    label: string;
+    icon: SavedLocationIcon;
+
+    locations: SavedLocation[];
+}
+
 export type POICategory =
     | "airport"
     | "amusementPark"
@@ -165,3 +173,67 @@ export function parsePOICategory(raw: string): POICategory {
 export function iconForPOICategory(category: POICategory): SavedLocationIcon {
     return POI_ICON_MAP[category];
 }
+
+export interface ResolvedLocation {
+	name: string;
+	address: string;
+	latitude: number;
+	longitude: number;
+	phoneNumber: string;
+	url: string;
+	pointOfInterestCategory: string;
+	street: string;
+	city: string;
+	state: string;
+	zip: string;
+	country: string;
+	countryCode: string;
+}
+
+
+export const PERSONAL_ICONS: { label: string; icon: SavedLocationIcon }[] = [
+	{ label: "Work",     icon: "briefcase.fill" },
+	{ label: "Home",     icon: "house.fill" },
+	{ label: "School",   icon: "graduationcap.fill" },
+	{ label: "Friend",   icon: "person.fill" },
+	{ label: "Family",   icon: "figure.2.and.child.holdinghands" },
+	{ label: "Gym",      icon: "dumbbell.fill" },
+	{ label: "Doctor",   icon: "stethoscope" },
+	{ label: "Favorite", icon: "heart.fill" },
+	{ label: "Star",     icon: "star.fill" },
+	{ label: "Pin",      icon: "mappin" },
+];
+
+export const POI_ICONS: { label: string; icon: SavedLocationIcon }[] = [
+	{ label: "Restaurant",   icon: "fork.knife" },
+	{ label: "Cafe",         icon: "cup.and.saucer.fill" },
+	{ label: "Bar",          icon: "mug.fill" },
+	{ label: "Grocery",      icon: "cart.fill" },
+	{ label: "Park",         icon: "leaf.fill" },
+	{ label: "Hospital",     icon: "cross.fill" },
+	{ label: "Pharmacy",     icon: "pills.fill" },
+	{ label: "Gas",          icon: "fuelpump.fill" },
+	{ label: "EV",           icon: "bolt.car.fill" },
+	{ label: "Parking",      icon: "parkingsign" },
+	{ label: "Transit",      icon: "tram.fill" },
+	{ label: "Airport",      icon: "airplane" },
+	{ label: "Hotel",        icon: "bed.double.fill" },
+	{ label: "Museum",       icon: "building.columns.fill" },
+	{ label: "Theater",      icon: "theatermasks.fill" },
+	{ label: "Movie",        icon: "film.fill" },
+	{ label: "Stadium",      icon: "sportscourt.fill" },
+	{ label: "Beach",        icon: "beach.umbrella.fill" },
+	{ label: "Campground",   icon: "tent.fill" },
+	{ label: "Nature",       icon: "tree.fill" },
+	{ label: "Library",      icon: "books.vertical.fill" },
+	{ label: "Bank",         icon: "building.columns.fill" },
+	{ label: "ATM",          icon: "banknote.fill" },
+	{ label: "Store",        icon: "bag.fill" },
+	{ label: "Laundry",      icon: "washer.fill" },
+	{ label: "Marina",       icon: "sailboat.fill" },
+	{ label: "Nightlife",    icon: "music.note" },
+	{ label: "Zoo",          icon: "pawprint.fill" },
+	{ label: "Aquarium",     icon: "fish.fill" },
+];
+
+export const ALL_ICONS = [...PERSONAL_ICONS, ...POI_ICONS];

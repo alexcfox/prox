@@ -5,31 +5,32 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function AddPlacesHeader() {
-	const theme = useTheme();
-	const { pendingSavedLocation, label, selectedIcon, clearPendingSavedLocation } = usePlacesSheetStore();
+    const theme = useTheme();
+    const { setShowCategories, setIsCategoryLoading } = usePlacesSheetStore();
 
-	const handleBack = () => {
-		clearPendingSavedLocation();
-	};
+    const handleBack = () => {
+        setShowCategories(false);
+				setIsCategoryLoading(false);
+    };
 
-	return (
-		<View style={styles.placesHeader}>
-			<View style={styles.placesInfo}>
-				<Text style={[styles.placesTitle, { color: theme.colors.primaryText }]}>
-					Add Place
-				</Text>
-				
-				<Text
-					style={[
-						styles.placesCount,
-						{ color: theme.colors.secondaryText }
-					]}
-				>
-					Customize however you need
-				</Text>
-			</View>
+    return (
+        <View style={styles.placesHeader}>
+            <View style={styles.placesInfo}>
+                <Text style={[styles.placesTitle, { color: theme.colors.primaryText }]}>
+                    Add Place
+                </Text>
+                
+                <Text
+                    style={[
+                        styles.placesCount,
+                        { color: theme.colors.secondaryText }
+                    ]}
+                >
+                    Customize however you need
+                </Text>
+            </View>
 
-			<Pressable
+            <Pressable
                 style={[
                     styles.addButton,
                     { backgroundColor: theme.colors.mutedText },
@@ -42,8 +43,8 @@ export default function AddPlacesHeader() {
                     tintColor={theme.colors.coloredButtonText}
                 />
             </Pressable>
-		</View>
-	);
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
 
-	addButton: {
+    addButton: {
         width: 36,
         height: 36,
         borderRadius: 18,
@@ -76,4 +77,3 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
 });
-
