@@ -1,4 +1,4 @@
-import { milesToMeters } from "@/stores/targetLocationStore";
+import { milesToMeters } from "@/utils/geo";
 import { useEffect, useState } from "react";
 import { NativeEventEmitter, NativeModules } from "react-native";
 

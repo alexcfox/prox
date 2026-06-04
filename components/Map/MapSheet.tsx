@@ -21,7 +21,7 @@ export default function MapSheet({ hidden }: Props) {
     const animatedIndex = useSharedValue(1);
 
     const snapPoints = useMemo(
-        () => [150, "92%"],
+        () => [150, "93.5%"],
         []
     );
 

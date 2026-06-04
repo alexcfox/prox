@@ -1,5 +1,6 @@
 import { useMapStore } from "@/stores/mapStore";
 import { useSavedLocationStore } from "@/stores/savedLocationStore";
+import { useTargetLocationStore } from "@/stores/targetLocationStore";
 import { useTheme } from "@/theme/theme";
 import { SymbolView } from "expo-symbols";
 import { useEffect, useRef, useState } from "react";
@@ -7,6 +8,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import MapView, { MapType, Marker } from "react-native-maps";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import CoinFlipButton from "../Shared/CoinFlipButton";
+import MapLocationControl from "./MapLocationControl";
 import MapTypeModal from "./modal/MapTypeModal";
 
 type BaseType = "explore" | "satellite";
@@ -24,6 +26,7 @@ export default function Map() {
     const { getSavedLocations } = useSavedLocationStore();
 
 	const hasInitialRecentered = useRef(false);
+    const { targetLocation } = useTargetLocationStore();
 
     const theme = useTheme();
     const { baseType, pickerVisible, openPicker, setUserLocation, userLocation } = useMapStore();
@@ -92,6 +95,23 @@ export default function Map() {
 		);
 	};
 
+    useEffect(() => {
+        if (!targetLocation || !mapRef.current) {
+            return;
+        }
+
+        mapRef.current.animateCamera(
+            {
+                center: {
+                    latitude: targetLocation.latitude,
+                    longitude: targetLocation.longitude,
+                },
+                altitude: 25000,
+            },
+            { duration: 750 }
+        );
+    }, [targetLocation]);
+
     return (
         <View style={styles.container}>
             <MapView
@@ -129,6 +149,33 @@ export default function Map() {
 					}
 				}}
             >
+                {targetLocation && (
+                    <Marker
+                        coordinate={{
+                            latitude: targetLocation.latitude,
+                            longitude: targetLocation.longitude,
+                        }}
+                        title="Target Location"
+                    >
+                        <View
+                            style={[
+                                styles.targetLocationMarker,
+                                {
+                                    shadowColor: theme.colors.primaryText,
+                                    backgroundColor: theme.colors.background,
+                                },
+                            ]}
+                        >
+                            <SymbolView
+                                name="scope"
+                                size={20}
+                                type="hierarchical"
+                                tintColor={theme.colors.accent}
+                            />
+                        </View>
+                    </Marker>
+                )}
+
                 {getSavedLocations().map((location) => (
                     <Marker
                         key={location.id}
@@ -147,6 +194,8 @@ export default function Map() {
                     </Marker>
                 ))}  
             </MapView>
+
+            <MapLocationControl></MapLocationControl>
 
             <Animated.View style={[styles.buttonStack, buttonStyle]}>
 
@@ -216,8 +265,8 @@ const styles = StyleSheet.create({
         fontFamily: "Courier",
     },
     savedLocationMarker: {
-        width: 32,
-        height: 32,
+        width: 24,
+        height: 24,
 
         borderRadius: 16,
 
@@ -233,4 +282,15 @@ const styles = StyleSheet.create({
 
         elevation: 3,
     },
+    targetLocationMarker: {
+        width: 24,
+        height: 24,
+        borderRadius: 17,
+        alignItems: "center",
+        justifyContent: "center",
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 3 },
+        elevation: 4,
+    }
 });
