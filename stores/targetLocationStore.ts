@@ -20,12 +20,12 @@ const MILES_TO_METERS = 1609.34;
 export const milesToMeters = (miles: number): number => miles * MILES_TO_METERS;
 
 const DEFAULT_TARGET_LOCATION: TargetLocation = {
-	city: "Bonney Lake",
-	state: "WA",
-	zip: "98391",
-	latitude: 47.1771,
-	longitude: -122.1865,
-	radiusMiles: 10,
+	city: "Las Vegas",
+	state: "NV",
+	zip: "89141",
+	latitude: 35.9957,
+	longitude: -115.2068,
+	radiusMiles: 25,
 };
 
 export const useTargetLocationStore = create<TargetLocationStore>((set) => ({

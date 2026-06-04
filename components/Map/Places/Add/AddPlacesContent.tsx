@@ -216,7 +216,7 @@ export default function AddPlacesContent() {
 								)}
 							</View>
 							<Text style={[styles.includeAllText, { color: theme.colors.primaryText }]}>
-								Include all {pendingSavedLocation.name} locations
+								Include all {pendingSavedLocation.name} locations within {targetLocation?.radiusMiles} miles 
 							</Text>
 						</Pressable>
 					)}
