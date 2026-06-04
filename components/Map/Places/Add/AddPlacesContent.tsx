@@ -1,10 +1,11 @@
 import { useAppleSearch } from "@/hooks/useAppleSearch";
 import { usePlacesSheetStore } from "@/stores/placesSheetStore";
-import { milesToMeters, useTargetLocationStore } from "@/stores/targetLocationStore";
+import { useTargetLocationStore } from "@/stores/targetLocationStore";
 import { useTheme } from "@/theme/theme";
 import { ALL_ICONS, iconForPOICategory } from "@/types/icons";
 import { ResolvedLocation, SavedLocation } from "@/types/location";
 import { parsePOICategory } from "@/types/location-mapping";
+import { milesToMeters } from "@/utils/geo";
 import { SymbolView } from "expo-symbols";
 import React from "react";
 import {

@@ -93,22 +93,6 @@ export default function Map() {
 		);
 	};
 
-    // useEffect(() => {
-    //     const test = async () => {
-    //         try {
-    //             const { AppleSearchModule } = NativeModules;
-
-    //             const result = await AppleSearchModule.search("Trader Joe's");
-
-    //             console.log("RESULT", result);
-    //         } catch (error) {
-    //             console.log("ERROR", error);
-    //         }
-    //     };
-
-    //     test();
-    // }, []);
-
     return (
         <View style={styles.container}>
             <MapView

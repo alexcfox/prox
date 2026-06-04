@@ -88,3 +88,12 @@ export interface ResolvedLocation {
     country: string;
     countryCode: string;
 }
+
+export interface TargetLocation {
+	city: string;
+	state: string;
+	zip: string;
+	latitude: number;
+	longitude: number;
+	radiusMiles: number;
+}
