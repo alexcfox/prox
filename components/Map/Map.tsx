@@ -20,7 +20,6 @@ const ALTITUDE: number = 10000;
 
 export default function Map() {
 
-    // const [cameraStats, setCameraStats] = useState<{ altitude?: number; pitch?: number } | null>({ altitude: 6500, pitch: 0 });
 	const mapRef = useRef<MapView | null>(null);
     const { getSavedLocations } = useSavedLocationStore();
 
@@ -176,13 +175,6 @@ export default function Map() {
             </Animated.View>
 
             {pickerVisible && <MapTypeModal />}
-
-            {/* {cameraStats && (
-                <View style={styles.debugOverlay}>
-                    <Text style={styles.debugText}>alt: {cameraStats.altitude?.toFixed(0)}</Text>
-                    <Text style={styles.debugText}>pitch: {cameraStats.pitch?.toFixed(1)}</Text>
-                </View>
-            )} */}
         </View>
     );
 }
