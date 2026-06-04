@@ -1,5 +1,3 @@
-import { RefObject, createRef } from "react";
-import MapView from "react-native-maps";
 import { create } from "zustand";
 
 type BaseType = "explore" | "satellite";
@@ -8,7 +6,6 @@ type MapStore = {
     baseType: BaseType;
     is3D: boolean;
     pickerVisible: boolean;
-    mapRef: RefObject<MapView | null>;
 
     userLocation: { latitude: number; longitude: number } | null;
     hasLocationPermission: boolean;
@@ -26,7 +23,6 @@ export const useMapStore = create<MapStore>((set) => ({
     baseType: "satellite",
     is3D: false,
     pickerVisible: false,
-    mapRef: createRef<MapView>(),
 
     userLocation: null,
     hasLocationPermission: false,

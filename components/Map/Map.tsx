@@ -21,14 +21,15 @@ const ALTITUDE: number = 10000;
 export default function Map() {
 
     // const [cameraStats, setCameraStats] = useState<{ altitude?: number; pitch?: number } | null>({ altitude: 6500, pitch: 0 });
-	
+	const mapRef = useRef<MapView | null>(null);
     const { getSavedLocations } = useSavedLocationStore();
 
 	const hasInitialRecentered = useRef(false);
 
     const theme = useTheme();
-    const { baseType, pickerVisible, openPicker, mapRef, setUserLocation, userLocation } = useMapStore();
+    const { baseType, pickerVisible, openPicker, setUserLocation, userLocation } = useMapStore();
 
+    
     const mapType = BASE_MAP[baseType];
 
     const buttonOpacity = useSharedValue(pickerVisible ? 0 : 1);
