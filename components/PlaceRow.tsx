@@ -13,7 +13,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { useTheme } from "@/theme/theme";
-import { SavedLocationGroup } from "@/types/SavedLocation";
+import { SavedLocationGroup } from "@/types/location";
 
 type Props = {
     group: SavedLocationGroup;

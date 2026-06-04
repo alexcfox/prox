@@ -1,18 +1,16 @@
 import { usePlacesSheetStore } from "@/stores/placesSheetStore";
 import { useSavedLocationStore } from "@/stores/savedLocationStore";
 import { useTheme } from "@/theme/theme";
-import { parsePOICategory, SavedLocation } from "@/types/SavedLocation";
+import { SavedLocation } from "@/types/location";
+import { parsePOICategory } from "@/types/location-mapping";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Keyboard, NativeModules, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import AddPlacesContent from "./Add/AddPlacesContent";
 import AddPlacesHeader from "./Add/AddPlacesHeader";
 import ListPlacesContent from "./List/ListPlacesContent";
 import ListPlacesHeader from "./List/ListPlacesHeader";
-import SearchCategoriesContent from "./SearchCategoriesContent";
-import SearchCategoriesHeader from "./SearchCategoriesHeader";
-import SearchCategoriesLoadingContent from "./SearchCategoriesLoadingContent";
 
 type Props = {
 	sheetIndex: number;
@@ -21,9 +19,9 @@ type Props = {
 export default function Places({ sheetIndex }: Props) {
 	const theme = useTheme();
 	const { savedLocationGroups, removeSavedLocationGroup, addSavedLocationGroup } = useSavedLocationStore();
-	const { pendingSavedLocation, label, selectedIcon, clearPendingSavedLocation, isCategoryLoading, selectedCategory } = usePlacesSheetStore();
+	const { pendingSavedLocation, label, selectedIcon, clearPendingSavedLocation } = usePlacesSheetStore();
 	const [swipingId, setSwipingId] = useState<string | null>(null);
-	const { setShowCategories, showCategories, setIsCategoryLoading, includeAllLocations, duplicateLocations } = usePlacesSheetStore();
+	const { includeAllLocations, duplicateLocations } = usePlacesSheetStore();
 
 	const handleSave = () => {
 		if (!pendingSavedLocation) return;
@@ -147,38 +145,11 @@ export default function Places({ sheetIndex }: Props) {
 		return allResults;
 	};
 
-	useEffect(() => {
-		console.log(selectedCategory);
-		if (!selectedCategory) return;
-
-		const load = async () => {
-			try {
-				setIsCategoryLoading(true);
-
-				const results = await tileSearch(
-					selectedCategory.poiCategory,
-					33.6846,
-					-117.8265
-				);
-
-				console.log("CATEGORY RESULTS", results);
-			} catch (error) {
-				console.error(error);
-			} finally {
-				setIsCategoryLoading(false);
-			}
-		};
-
-		load();
-	}, [selectedCategory]);
-
 	return (
 		<View style={styles.container}>
 			<View style={styles.headerContainer}>
 				{pendingSavedLocation ? (
 					<AddPlacesHeader />
-				) : showCategories ? (
-					<SearchCategoriesHeader />
 				) : (
 					<ListPlacesHeader />
 				)}
@@ -188,38 +159,27 @@ export default function Places({ sheetIndex }: Props) {
 				contentContainerStyle={[styles.scrollContent, { paddingBottom: keyboardVisible ? 400 : (pendingSavedLocation ? 0 : 100)}]}
 				keyboardShouldPersistTaps="handled"
 			>
-				{ !showCategories ? (
-					<>
-						<AddPlacesContent />
-						<Animated.View style={listAnimatedStyle}>
-							{!pendingSavedLocation && (
-								<>
-									{/* <SearchCategoriesButton
-										onPress={() => {
-											console.log("Search by Category");
-											setShowCategories(true);
-										}}
-									/> */}
-									<ListPlacesContent
-										savedLocationGroups={savedLocationGroups}
-										removeSavedLocationGroup={removeSavedLocationGroup}
-										swipingId={swipingId}
-										setSwipingId={setSwipingId}
-									/>
-								</>
-							)}
-						</Animated.View>
-					</>
-				) : (
-					    isCategoryLoading ? (
-							<SearchCategoriesLoadingContent />
-						) : selectedCategory ? (
-							<></>
-							// <CategoryResultsContent />
-						) : (
-							<SearchCategoriesContent />
-						)
-				)}
+				<>
+					<AddPlacesContent />
+					<Animated.View style={listAnimatedStyle}>
+						{!pendingSavedLocation && (
+							<>
+								{/* <SearchCategoriesButton
+									onPress={() => {
+										console.log("Search by Category");
+										setShowCategories(true);
+									}}
+								/> */}
+								<ListPlacesContent
+									savedLocationGroups={savedLocationGroups}
+									removeSavedLocationGroup={removeSavedLocationGroup}
+									swipingId={swipingId}
+									setSwipingId={setSwipingId}
+								/>
+							</>
+						)}
+					</Animated.View>
+				</>
 			</BottomSheetScrollView>
 
 			{pendingSavedLocation && (

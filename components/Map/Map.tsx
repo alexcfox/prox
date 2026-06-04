@@ -1,4 +1,3 @@
-import { useMapSheetStore } from "@/stores/mapSheetStore";
 import { useMapStore } from "@/stores/mapStore";
 import { useSavedLocationStore } from "@/stores/savedLocationStore";
 import { useTheme } from "@/theme/theme";
@@ -22,11 +21,6 @@ const ALTITUDE: number = 10000;
 export default function Map() {
 
     // const [cameraStats, setCameraStats] = useState<{ altitude?: number; pitch?: number } | null>({ altitude: 6500, pitch: 0 });
-    
-    const {
-        selectedTab,
-        setSelectedTab,
-    } = useMapSheetStore();
 	
     const { getSavedLocations } = useSavedLocationStore();
 

@@ -1,12 +1,4 @@
-export interface Coordinate {
-    latitude: number;
-    longitude: number;
-}
-
-export interface MapLayer {
-    id: string;
-    visible: boolean;
-}
+import { Coordinate } from "./geo";
 
 export interface MapMarker {
     id: string;
@@ -20,9 +12,3 @@ export interface MapMarker {
 
     icon?: string;
 }
-
-export type MapTab =
-    | "places"
-    | "preferences"
-    | "financials"
-    | "favorites";

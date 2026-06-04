@@ -1,4 +1,5 @@
-import { SavedLocation, SavedLocationGroup } from "@/types/SavedLocation";
+
+import { SavedLocation, SavedLocationGroup } from "@/types/location";
 import { create } from "zustand";
 
 type SavedLocationStore = {

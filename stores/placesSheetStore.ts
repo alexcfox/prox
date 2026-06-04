@@ -1,25 +1,15 @@
-import { ResolvedLocation, SavedLocation, SavedLocationIcon } from "@/types/SavedLocation";
-import { SearchCategory } from "@/types/SearchCategories";
+import { SavedLocationIcon } from "@/types/icons";
+import { ResolvedLocation, SavedLocation } from "@/types/location";
 import { create } from "zustand";
 
 interface PlacesSheetState {
 	pendingSavedLocation: SavedLocation | null;
 	label: string;
 	selectedIcon: SavedLocationIcon;
-
-	showCategories: boolean;
-
-	selectedCategory: SearchCategory | null;
-	isCategoryLoading: boolean;
-
+	
 	duplicateLocations: ResolvedLocation[];
 	includeAllLocations: boolean;
 	showIncludeAll: boolean;
-
-	setShowCategories: (show: boolean) => void;
-
-	setSelectedCategory: (category: SearchCategory | null) => void;
-	setIsCategoryLoading: (loading: boolean) => void;
 
 	setPendingSavedLocation: (location: SavedLocation) => void;
 	setLabel: (label: string) => void;
@@ -44,15 +34,6 @@ export const usePlacesSheetStore = create<PlacesSheetState>((set) => ({
 	duplicateLocations: [],
 	includeAllLocations: false,
 	showIncludeAll: false,
-
-	setShowCategories: (show) =>
-		set({ showCategories: show }),
-
-	setSelectedCategory: (category) =>
-		set({ selectedCategory: category }),
-
-	setIsCategoryLoading: (loading) =>
-		set({ isCategoryLoading: loading }),
 
 	setPendingSavedLocation: (location) =>
 		set({
@@ -79,10 +60,6 @@ export const usePlacesSheetStore = create<PlacesSheetState>((set) => ({
 			pendingSavedLocation: null,
 			label: "",
 			selectedIcon: "mappin",
-
-			showCategories: false,
-			selectedCategory: null,
-			isCategoryLoading: false,
 
 			duplicateLocations: [],
 			includeAllLocations: false,

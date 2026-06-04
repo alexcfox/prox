@@ -1,0 +1,48 @@
+import { POICategory } from "./location";
+
+const POI_CATEGORY_MAP: Record<string, POICategory> = {
+    "MKPOICategoryAirport": "airport",
+    "MKPOICategoryAmusementPark": "amusementPark",
+    "MKPOICategoryAquarium": "aquarium",
+    "MKPOICategoryATM": "atm",
+    "MKPOICategoryBakery": "bakery",
+    "MKPOICategoryBank": "bank",
+    "MKPOICategoryBeach": "beach",
+    "MKPOICategoryBrewery": "brewery",
+    "MKPOICategoryCafe": "cafe",
+    "MKPOICategoryCampground": "campground",
+    "MKPOICategoryCarRental": "carRental",
+    "MKPOICategoryEVCharger": "evCharger",
+    "MKPOICategoryFireStation": "fireStation",
+    "MKPOICategoryFitnessCenter": "fitnessCenter",
+    "MKPOICategoryFoodMarket": "foodMarket",
+    "MKPOICategoryGasStation": "gasStation",
+    "MKPOICategoryHospital": "hospital",
+    "MKPOICategoryHotel": "hotel",
+    "MKPOICategoryLaundry": "laundry",
+    "MKPOICategoryLibrary": "library",
+    "MKPOICategoryMarina": "marina",
+    "MKPOICategoryMovieTheater": "movieTheater",
+    "MKPOICategoryMuseum": "museum",
+    "MKPOICategoryNationalPark": "nationalPark",
+    "MKPOICategoryNightlife": "nightlife",
+    "MKPOICategoryPark": "park",
+    "MKPOICategoryParking": "parking",
+    "MKPOICategoryPharmacy": "pharmacy",
+    "MKPOICategoryPolice": "police",
+    "MKPOICategoryPostOffice": "postOffice",
+    "MKPOICategoryPublicTransport": "publicTransport",
+    "MKPOICategoryRestaurant": "restaurant",
+    "MKPOICategoryRestroom": "restroom",
+    "MKPOICategorySchool": "school",
+    "MKPOICategoryStadium": "stadium",
+    "MKPOICategoryStore": "store",
+    "MKPOICategoryTheater": "theater",
+    "MKPOICategoryUniversity": "university",
+    "MKPOICategoryWinery": "winery",
+    "MKPOICategoryZoo": "zoo",
+};
+
+export function parsePOICategory(raw: string): POICategory {
+    return POI_CATEGORY_MAP[raw] ?? "unknown";
+}

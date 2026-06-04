@@ -1,7 +1,7 @@
 import PlaceRow from "@/components/PlaceRow";
 import AnimatedDivider from "@/components/Shared/AnimatedDivider";
 import { useTheme } from "@/theme/theme";
-import { SavedLocationGroup } from "@/types/SavedLocation";
+import { SavedLocationGroup } from "@/types/location";
 import { SymbolView } from "expo-symbols";
 import React, { Fragment } from "react";
 import { StyleSheet, Text, View } from "react-native";
