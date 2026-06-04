@@ -6,7 +6,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function AddPlacesHeader() {
 	const theme = useTheme();
-	const { pendingSavedLocation, label, selectedIcon, clearPendingSavedLocation } = usePlacesSheetStore();
+	const { clearPendingSavedLocation } = usePlacesSheetStore();
 
 	const handleBack = () => {
 		clearPendingSavedLocation();

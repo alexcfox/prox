@@ -1,25 +1,23 @@
 import PlaceRow from "@/components/PlaceRow";
 import AnimatedDivider from "@/components/Shared/AnimatedDivider";
+import { useSavedLocationStore } from "@/stores/savedLocationStore";
 import { useTheme } from "@/theme/theme";
-import { SavedLocationGroup } from "@/types/location";
 import { SymbolView } from "expo-symbols";
 import React, { Fragment } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 type Props = {
-    savedLocationGroups: SavedLocationGroup[];
-    removeSavedLocationGroup: (id: string) => void;
     swipingId: string | null;
     setSwipingId: (id: string | null) => void;
 };
 
 export default function ListPlacesContent({
-    savedLocationGroups,
-    removeSavedLocationGroup,
     swipingId,
     setSwipingId,
 }: Props) {
+
     const theme = useTheme();
+    const { savedLocationGroups, removeSavedLocationGroup } = useSavedLocationStore();
 
     return (
         <>

@@ -5,7 +5,7 @@ import { SavedLocation } from "@/types/location";
 import { parsePOICategory } from "@/types/location-mapping";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import React, { useState } from "react";
-import { Keyboard, NativeModules, Pressable, StyleSheet, Text, View } from "react-native";
+import { Keyboard, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import AddPlacesContent from "./Add/AddPlacesContent";
 import AddPlacesHeader from "./Add/AddPlacesHeader";
@@ -18,7 +18,7 @@ type Props = {
 
 export default function Places({ sheetIndex }: Props) {
 	const theme = useTheme();
-	const { savedLocationGroups, removeSavedLocationGroup, addSavedLocationGroup } = useSavedLocationStore();
+	const { addSavedLocationGroup } = useSavedLocationStore();
 	const { pendingSavedLocation, label, selectedIcon, clearPendingSavedLocation } = usePlacesSheetStore();
 	const [swipingId, setSwipingId] = useState<string | null>(null);
 	const { includeAllLocations, duplicateLocations } = usePlacesSheetStore();
@@ -101,50 +101,6 @@ export default function Places({ sheetIndex }: Props) {
 		opacity: opacity.value,
 	}));
 
-	const tileSearch = async (
-		category: string,
-		centerLat: number,
-		centerLng: number
-	) => {
-		const { AppleSearchModule } = NativeModules;
-		const step = 0.04;
-		const totalRadius = 0.12;
-		const tiles: [number, number][] = [];
-
-		for (let dlat = -totalRadius; dlat <= totalRadius; dlat += step) {
-			for (let dlng = -totalRadius; dlng <= totalRadius; dlng += step) {
-				const dist = Math.sqrt(dlat * dlat + dlng * dlng);
-				if (dist <= totalRadius) {
-					tiles.push([centerLat + dlat, centerLng + dlng]);
-				}
-			}
-		}
-
-		const seen = new Set<string>();
-		const allResults: any[] = [];
-
-		for (const [lat, lng] of tiles) {
-			try {
-				const results = await AppleSearchModule.searchCategory(
-					category, lat, lng, 5000
-				);
-				for (const r of results) {
-					const key = `${r.name}|${r.address}`;
-					if (!seen.has(key)) {
-						seen.add(key);
-						allResults.push(r);
-					}
-				}
-			} catch (e) {
-				// skip failed tiles, don't abort the whole search
-				console.warn(`tile [${lat}, ${lng}] failed, skipping`);
-			}
-			await new Promise(res => setTimeout(res, 200));
-		}
-
-		return allResults;
-	};
-
 	return (
 		<View style={styles.container}>
 			<View style={styles.headerContainer}>
@@ -164,15 +120,7 @@ export default function Places({ sheetIndex }: Props) {
 					<Animated.View style={listAnimatedStyle}>
 						{!pendingSavedLocation && (
 							<>
-								{/* <SearchCategoriesButton
-									onPress={() => {
-										console.log("Search by Category");
-										setShowCategories(true);
-									}}
-								/> */}
 								<ListPlacesContent
-									savedLocationGroups={savedLocationGroups}
-									removeSavedLocationGroup={removeSavedLocationGroup}
 									swipingId={swipingId}
 									setSwipingId={setSwipingId}
 								/>
