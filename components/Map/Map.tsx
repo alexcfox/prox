@@ -2,9 +2,10 @@ import { useMapStore } from "@/stores/mapStore";
 import { useSavedLocationStore } from "@/stores/savedLocationStore";
 import { useTargetLocationStore } from "@/stores/targetLocationStore";
 import { useTheme } from "@/theme/theme";
+import { milesToMeters } from "@/utils/geo";
 import { SymbolView } from "expo-symbols";
 import { useEffect, useRef, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Keyboard, Pressable, StyleSheet, View } from "react-native";
 import MapView, { MapType, Marker } from "react-native-maps";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import CoinFlipButton from "../Shared/CoinFlipButton";
@@ -106,7 +107,7 @@ export default function Map() {
                     latitude: targetLocation.latitude,
                     longitude: targetLocation.longitude,
                 },
-                altitude: 25000,
+                altitude:  milesToMeters(targetLocation.radiusMiles),
             },
             { duration: 750 }
         );
@@ -119,6 +120,7 @@ export default function Map() {
                 style={styles.map}
                 mapType={mapType.type}
                 ref={mapRef}
+                onPress={() => Keyboard.dismiss()}
                 onRegionChangeComplete={handleRegionChangeComplete}
                 showsUserLocation={true}
                 rotateEnabled

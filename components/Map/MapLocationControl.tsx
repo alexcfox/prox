@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
     ActivityIndicator,
     FlatList,
+    Keyboard,
     Pressable,
     StyleSheet,
     Text,
@@ -24,7 +25,8 @@ export default function MapLocationControl() {
 
     const targetLocation = useTargetLocationStore((s) => s.targetLocation);
     const setTargetLocation = useTargetLocationStore((s) => s.setTargetLocation);
-
+    const inputRef = useRef<TextInput>(null);
+    
     const region = targetLocation
         ? {
               latitude: targetLocation.latitude,
@@ -60,6 +62,8 @@ export default function MapLocationControl() {
         subtitle: string;
     }) => {
         setResolving(true);
+        inputRef.current?.blur();
+        Keyboard.dismiss();
 
         try {
             const raw: ResolvedLocation =
@@ -95,10 +99,13 @@ export default function MapLocationControl() {
                 ]}
             >
                 <TextInput
+                    ref={inputRef}
                     style={[
                         styles.input,
                         { color: theme.colors.primaryText },
                     ]}
+                    spellCheck={false}
+                    keyboardType="web-search"
                     placeholder="Search location..."
                     placeholderTextColor={
                         theme.colors.secondaryText
