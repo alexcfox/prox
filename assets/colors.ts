@@ -15,7 +15,9 @@ export const Colors = {
         coloredButtonText: "#FFFFFF",
         divider: "#000000",
         swipedTab: "#E8E8ED",
-        cancelRed: "#FF3B30"
+        cancelRed: "#FF3B30",
+        locationMarkerBackground: "#007AFF",
+        locatoinMarkerIconColor: "#FFFFFF"
     },
     dark: {
         background: "#000000",         
@@ -29,7 +31,9 @@ export const Colors = {
         coloredButtonText: "#000000",
         divider: "#FFFFFF",
         swipedTab: "#252527",
-        cancelRed: "#FF3B30"
+        cancelRed: "#FF3B30",
+        locationMarkerBackground: "#007AFF",
+        locatoinMarkerIconColor: "#FFFFFF"
     },
 };
 

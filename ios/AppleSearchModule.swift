@@ -26,10 +26,30 @@ class AppleSearchModule: RCTEventEmitter, MKLocalSearchCompleterDelegate {
         return ["searchResults"]
     }
 
-    // MARK: - Completer Search (autocomplete, event-emitter based)
+    // MARK: - Helpers
+
+    private func resolveResultTypes(_ types: [String]) -> MKLocalSearchCompleter.ResultType {
+        var result: MKLocalSearchCompleter.ResultType = []
+        if types.contains("address") { result.insert(.address) }
+        if types.contains("pointOfInterest") { result.insert(.pointOfInterest) }
+        return result.isEmpty ? [.address, .pointOfInterest] : result
+    }
+
+    private func radiusToSpan(radiusMeters: Double) -> MKCoordinateSpan {
+        let delta = (radiusMeters / 111_000) * 2
+        return MKCoordinateSpan(latitudeDelta: delta, longitudeDelta: delta)
+    }
+
+    // MARK: - Completer Search (region-biased)
 
     @objc
-    func startSearch(_ query: String, latitude: Double, longitude: Double, radiusMeters: Double) {
+    func startSearch(
+        _ query: String,
+        latitude: Double,
+        longitude: Double,
+        radiusMeters: Double,
+        resultTypes: [String]
+    ) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
 
@@ -38,9 +58,29 @@ class AppleSearchModule: RCTEventEmitter, MKLocalSearchCompleterDelegate {
                 return
             }
 
+            self.completer.resultTypes = self.resolveResultTypes(resultTypes)
+
             let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             let span = self.radiusToSpan(radiusMeters: radiusMeters)
             self.completer.region = MKCoordinateRegion(center: center, span: span)
+            self.completer.queryFragment = query
+        }
+    }
+
+    // MARK: - Completer Search (unbiased)
+
+    @objc
+    func startSearchUnbiased(_ query: String, resultTypes: [String]) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+
+            if query.trimmingCharacters(in: .whitespaces).isEmpty {
+                self.sendEvent(withName: "searchResults", body: [])
+                return
+            }
+
+            self.completer.resultTypes = self.resolveResultTypes(resultTypes)
+            self.completer.region = MKCoordinateRegion(.world)
             self.completer.queryFragment = query
         }
     }
@@ -226,13 +266,5 @@ class AppleSearchModule: RCTEventEmitter, MKLocalSearchCompleterDelegate {
                 resolve(results)
             }
         }
-    }
-
-    // MARK: - Helpers
-
-    private func radiusToSpan(radiusMeters: Double) -> MKCoordinateSpan {
-        // Rough conversion: 1 degree lat ≈ 111,000m
-        let delta = (radiusMeters / 111_000) * 2
-        return MKCoordinateSpan(latitudeDelta: delta, longitudeDelta: delta)
     }
 }

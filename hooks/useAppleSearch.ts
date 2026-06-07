@@ -13,6 +13,8 @@ export interface SearchRegion {
     radiusMiles: number;
 }
 
+export type SearchResultType = "address" | "pointOfInterest";
+
 const { AppleSearchModule } = NativeModules;
 const emitter = new NativeEventEmitter(AppleSearchModule);
 
@@ -32,7 +34,10 @@ export function useAppleSearch(region: SearchRegion | null) {
         };
     }, []);
 
-    const search = (text: string) => {
+    const search = (
+        text: string,
+        resultTypes: SearchResultType[] = ["address", "pointOfInterest"]
+    ) => {
         setQuery(text);
         clearTimeout(debounceTimer);
 
@@ -42,18 +47,18 @@ export function useAppleSearch(region: SearchRegion | null) {
             return;
         }
 
-        if (!region) {
-            console.warn("useAppleSearch: no region set, skipping search");
-            return;
-        }
-
         debounceTimer = setTimeout(() => {
-            AppleSearchModule.startSearch(
-                text,
-                region.latitude,
-                region.longitude,
-                milesToMeters(region.radiusMiles)
-            );
+            if (region) {
+                AppleSearchModule.startSearch(
+                    text,
+                    region.latitude,
+                    region.longitude,
+                    milesToMeters(region.radiusMiles),
+                    resultTypes
+                );
+            } else {
+                AppleSearchModule.startSearchUnbiased(text, resultTypes);
+            }
         }, 150);
     };
 

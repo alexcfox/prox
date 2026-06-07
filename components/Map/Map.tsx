@@ -6,7 +6,7 @@ import { milesToMeters } from "@/utils/geo";
 import { SymbolView } from "expo-symbols";
 import { useEffect, useRef, useState } from "react";
 import { Keyboard, Pressable, StyleSheet, View } from "react-native";
-import MapView, { MapType, Marker } from "react-native-maps";
+import MapView, { Circle, MapType, Marker } from "react-native-maps";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import CoinFlipButton from "../Shared/CoinFlipButton";
 import MapLocationControl from "./MapLocationControl";
@@ -20,6 +20,8 @@ const BASE_MAP: Record<BaseType, { type: MapType }> = {
 };
 
 const ALTITUDE: number = 10000; 
+const MARKER_SIZE: number = 18; 
+const MARKER_ICON_SIZE: number = 14; 
 
 export default function Map() {
 
@@ -81,16 +83,16 @@ export default function Map() {
     };
 
 	const handleRecenter = async () => {
-		if (!userLocation || !mapRef.current) return;
+		if (!targetLocation || !mapRef.current) return;
 
 		mapRef.current?.animateCamera(
 			{
 				center: {
-					latitude: userLocation.latitude,
-					longitude: userLocation.longitude,
+					latitude: targetLocation.latitude,
+					longitude: targetLocation.longitude,
 				},
 				heading: 0,
-				altitude: ALTITUDE,
+				altitude: milesToMeters(targetLocation.radiusMiles) * 8.5,
 			},
             { duration: 700 }
 		);
@@ -107,10 +109,11 @@ export default function Map() {
                     latitude: targetLocation.latitude,
                     longitude: targetLocation.longitude,
                 },
-                altitude:  milesToMeters(targetLocation.radiusMiles),
+                altitude:  milesToMeters(targetLocation.radiusMiles) * 8.5,
             },
             { duration: 750 }
         );
+        console.log(milesToMeters(targetLocation.radiusMiles) * 2);
     }, [targetLocation]);
 
     return (
@@ -152,30 +155,43 @@ export default function Map() {
 				}}
             >
                 {targetLocation && (
-                    <Marker
-                        coordinate={{
-                            latitude: targetLocation.latitude,
-                            longitude: targetLocation.longitude,
-                        }}
-                        title="Target Location"
-                    >
-                        <View
-                            style={[
-                                styles.targetLocationMarker,
-                                {
-                                    shadowColor: theme.colors.primaryText,
-                                    backgroundColor: theme.colors.background,
-                                },
-                            ]}
+                    <>
+                        <Circle
+                            center={{
+                                latitude: targetLocation.latitude,
+                                longitude: targetLocation.longitude,
+                            }}
+                            radius={targetLocation.radiusMiles * 1609.34}
+                            strokeWidth={2}
+                            strokeColor={`${theme.colors.background}50`}
+                            fillColor="rgba(0,0,0,0)"
+                        />
+
+                        <Marker
+                            coordinate={{
+                                latitude: targetLocation.latitude,
+                                longitude: targetLocation.longitude,
+                            }}
+                            title="Target Location"
                         >
-                            <SymbolView
-                                name="scope"
-                                size={20}
-                                type="hierarchical"
-                                tintColor={theme.colors.accent}
-                            />
-                        </View>
-                    </Marker>
+                            <View
+                                style={[
+                                    styles.targetLocationMarker,
+                                    {
+                                        shadowColor: theme.colors.primaryText,
+                                        backgroundColor: theme.colors.locationMarkerBackground,
+                                    },
+                                ]}
+                            >
+                                <SymbolView
+                                    name="scope"
+                                    size={MARKER_ICON_SIZE}
+                                    type="hierarchical"
+                                    tintColor={theme.colors.locatoinMarkerIconColor}
+                                />
+                            </View>
+                        </Marker>
+                    </>
                 )}
 
                 {getSavedLocations().map((location) => (
@@ -190,7 +206,7 @@ export default function Map() {
                                 tintColor={theme.colors.primaryText}
                                 type="hierarchical"
                                 name={location.icon}
-                                size={20}
+                                size={MARKER_ICON_SIZE}
                             />
                         </View>
                     </Marker>
@@ -207,13 +223,15 @@ export default function Map() {
                     disabled={pickerVisible}
                 />
 
-                <Pressable
-                    style={[styles.button, { backgroundColor: theme.colors.secondaryBackground }]}
-                    onPress={handleRecenter}
-                    disabled={pickerVisible}
-                >
-                    <SymbolView name="location.fill" size={20} tintColor={theme.colors.primaryText} />
-                </Pressable>
+                {targetLocation && 
+                    <Pressable
+                        style={[styles.button, { backgroundColor: theme.colors.secondaryBackground }]}
+                        onPress={handleRecenter}
+                        disabled={pickerVisible}
+                    >
+                        <SymbolView name="scope" size={20} tintColor={theme.colors.primaryText} />
+                    </Pressable>
+                }
 
                 <Pressable
                     style={[styles.button, { backgroundColor: theme.colors.secondaryBackground }]}
@@ -267,8 +285,8 @@ const styles = StyleSheet.create({
         fontFamily: "Courier",
     },
     savedLocationMarker: {
-        width: 24,
-        height: 24,
+        width: MARKER_SIZE,
+        height: MARKER_SIZE,
 
         borderRadius: 16,
 
@@ -285,8 +303,8 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     targetLocationMarker: {
-        width: 24,
-        height: 24,
+        width: MARKER_SIZE,
+        height: MARKER_SIZE,
         borderRadius: 17,
         alignItems: "center",
         justifyContent: "center",
