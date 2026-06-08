@@ -3,66 +3,73 @@ import { ResolvedLocation, SavedLocation } from "@/types/location";
 import { create } from "zustand";
 
 interface PlacesSheetState {
-	pendingSavedLocation: SavedLocation | null;
-	label: string;
-	selectedIcon: SavedLocationIcon;
-	
-	duplicateLocations: ResolvedLocation[];
-	includeAllLocations: boolean;
-	showIncludeAll: boolean;
+    pendingSavedLocation: SavedLocation | null;
+    label: string;
+    selectedIcon: SavedLocationIcon;
+    selectedColor: string;
 
-	setPendingSavedLocation: (location: SavedLocation) => void;
-	setLabel: (label: string) => void;
-	setSelectedIcon: (icon: SavedLocationIcon) => void;
-	clearPendingSavedLocation: () => void;
+    duplicateLocations: ResolvedLocation[];
+    includeAllLocations: boolean;
+    showIncludeAll: boolean;
 
-	setDuplicateLocations: (locations: ResolvedLocation[]) => void;
-	setIncludeAllLocations: (include: boolean) => void;
-	setShowIncludeAll: (show: boolean) => void;
+    setPendingSavedLocation: (location: SavedLocation) => void;
+    setLabel: (label: string) => void;
+    setSelectedIcon: (icon: SavedLocationIcon) => void;
+    setSelectedColor: (color: string) => void;
+    clearPendingSavedLocation: () => void;
+
+    setDuplicateLocations: (locations: ResolvedLocation[]) => void;
+    setIncludeAllLocations: (include: boolean) => void;
+    setShowIncludeAll: (show: boolean) => void;
 }
 
 export const usePlacesSheetStore = create<PlacesSheetState>((set) => ({
-	pendingSavedLocation: null,
-	label: "",
-	selectedIcon: "mappin",
+    pendingSavedLocation: null,
+    label: "",
+    selectedIcon: "mappin",
+    selectedColor: "#FFFFFF",
 
-	showCategories: false,
+    showCategories: false,
 
-	selectedCategory: null,
-	isCategoryLoading: false,
+    selectedCategory: null,
+    isCategoryLoading: false,
 
-	duplicateLocations: [],
-	includeAllLocations: false,
-	showIncludeAll: false,
+    duplicateLocations: [],
+    includeAllLocations: false,
+    showIncludeAll: false,
 
-	setPendingSavedLocation: (location) =>
-		set({
-			pendingSavedLocation: location,
-			label: location.label,
-			selectedIcon: location.icon,
-		}),
+    setPendingSavedLocation: (location) =>
+        set({
+            pendingSavedLocation: location,
+            label: location.label,
+            selectedIcon: location.icon,
+            selectedColor: location.color ?? "#FFFFFF",
+        }),
 
-	setLabel: (label) => set({ label }),
+    setLabel: (label) => set({ label }),
 
-	setSelectedIcon: (icon) => set({ selectedIcon: icon }),
+    setSelectedIcon: (icon) => set({ selectedIcon: icon }),
 
-	setDuplicateLocations: (locations) =>
-		set({ duplicateLocations: locations }),
+    setSelectedColor: (color) => set({ selectedColor: color }),
 
-	setIncludeAllLocations: (include) =>
-		set({ includeAllLocations: include }),
+    setDuplicateLocations: (locations) =>
+        set({ duplicateLocations: locations }),
 
-	setShowIncludeAll: (show) =>
-		set({ showIncludeAll: show }),
+    setIncludeAllLocations: (include) =>
+        set({ includeAllLocations: include }),
 
-	clearPendingSavedLocation: () =>
-		set({
-			pendingSavedLocation: null,
-			label: "",
-			selectedIcon: "mappin",
+    setShowIncludeAll: (show) =>
+        set({ showIncludeAll: show }),
 
-			duplicateLocations: [],
-			includeAllLocations: false,
-			showIncludeAll: false,
-		}),
+    clearPendingSavedLocation: () =>
+        set({
+            pendingSavedLocation: null,
+            label: "",
+            selectedIcon: "mappin",
+            selectedColor: "#FFFFFF",
+
+            duplicateLocations: [],
+            includeAllLocations: false,
+            showIncludeAll: false,
+        }),
 }));

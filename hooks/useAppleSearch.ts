@@ -20,19 +20,20 @@ const emitter = new NativeEventEmitter(AppleSearchModule);
 
 let debounceTimer: ReturnType<typeof setTimeout>;
 
-export function useAppleSearch(region: SearchRegion | null) {
+export function useAppleSearch(region: SearchRegion | null, context: string) {
     const [results, setResults] = useState<SearchResult[]>([]);
     const [query, setQuery] = useState("");
 
     useEffect(() => {
-        const sub = emitter.addListener("searchResults", (data: SearchResult[]) => {
-            setResults(data);
+        const sub = emitter.addListener("searchResults", (data: { context: string; results: SearchResult[] }) => {
+            if (data.context !== context) return;
+            setResults(data.results);
         });
         return () => {
             sub.remove();
             AppleSearchModule.clearSearch();
         };
-    }, []);
+    }, [context]);
 
     const search = (
         text: string,
@@ -54,10 +55,11 @@ export function useAppleSearch(region: SearchRegion | null) {
                     region.latitude,
                     region.longitude,
                     milesToMeters(region.radiusMiles),
-                    resultTypes
+                    resultTypes,
+                    context
                 );
             } else {
-                AppleSearchModule.startSearchUnbiased(text, resultTypes);
+                AppleSearchModule.startSearchUnbiased(text, resultTypes, context);
             }
         }, 150);
     };

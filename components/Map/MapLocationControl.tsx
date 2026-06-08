@@ -16,6 +16,7 @@ import { NativeModules } from "react-native";
 
 import { useAppleSearch } from "@/hooks/useAppleSearch";
 import { useMapStore } from "@/stores/mapStore";
+import { useSavedLocationStore } from "@/stores/savedLocationStore";
 import { useTargetLocationStore } from "@/stores/targetLocationStore";
 import { useTheme } from "@/theme/theme";
 import { ResolvedLocation } from "@/types/location";
@@ -26,6 +27,7 @@ export default function MapLocationControl() {
     const theme = useTheme();
 
     const userLocation = useMapStore((s) => s.userLocation);
+    const clearSavedLocations = useSavedLocationStore((s) => s.clearSavedLocations);
     const targetLocation = useTargetLocationStore((s) => s.targetLocation);
     const setTargetLocation = useTargetLocationStore((s) => s.setTargetLocation);
     const inputRef = useRef<TextInput>(null);
@@ -44,10 +46,10 @@ export default function MapLocationControl() {
           }
         : null;
 
-    const { query, results, search } = useAppleSearch(region);
+    const { query, results, search } = useAppleSearch(region, "mapLocationControl");
 
     const radius = targetLocation?.radiusMiles ?? 10;
-    const radiusOptions = [5, 10, 15, 25, 50];
+    const radiusOptions = [5, 10, 15];
 
     const onRadiusPress = () => {
         if (!targetLocation) return;
@@ -63,7 +65,7 @@ export default function MapLocationControl() {
     const handleUnlock = () => {
         Alert.alert(
             "Change Location?",
-            "Are you sure you want to change your search location?",
+            "Are you sure you want to change your search location? This will clear your saved places.",
             [
                 { text: "Cancel", style: "cancel" },
                 {
@@ -104,10 +106,11 @@ export default function MapLocationControl() {
                 zip: raw.zip,
                 latitude: raw.latitude,
                 longitude: raw.longitude,
-                radiusMiles: targetLocation?.radiusMiles ?? 25,
+                radiusMiles: targetLocation?.radiusMiles ?? 10,
             });
 
             setIsEditing(false);
+            clearSavedLocations();
         } catch (e) {
             console.log("resolve error", e);
         } finally {
@@ -135,7 +138,7 @@ export default function MapLocationControl() {
                 zip: raw.zip,
                 latitude: userLocation.latitude,
                 longitude: userLocation.longitude,
-                radiusMiles: targetLocation?.radiusMiles ?? 25,
+                radiusMiles: targetLocation?.radiusMiles ?? 10,
             });
 
             setIsEditing(false);

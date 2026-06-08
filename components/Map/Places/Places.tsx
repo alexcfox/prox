@@ -19,7 +19,7 @@ type Props = {
 export default function Places({ sheetIndex }: Props) {
 	const theme = useTheme();
 	const { addSavedLocationGroup } = useSavedLocationStore();
-	const { pendingSavedLocation, label, selectedIcon, clearPendingSavedLocation } = usePlacesSheetStore();
+	const { pendingSavedLocation, label, selectedIcon, selectedColor, clearPendingSavedLocation } = usePlacesSheetStore();
 	const [swipingId, setSwipingId] = useState<string | null>(null);
 	const { includeAllLocations, duplicateLocations } = usePlacesSheetStore();
 
@@ -51,6 +51,7 @@ export default function Places({ sheetIndex }: Props) {
 					country: raw.country,
 					countryCode: raw.countryCode,
 					icon: selectedIcon,
+					color: selectedColor,
 				};
 			});
 		} else {
@@ -59,6 +60,7 @@ export default function Places({ sheetIndex }: Props) {
 					...pendingSavedLocation,
 					label,
 					icon: selectedIcon,
+					color: selectedColor,
 				},
 			];
 		}
@@ -66,6 +68,7 @@ export default function Places({ sheetIndex }: Props) {
 		addSavedLocationGroup({
 			id: Date.now().toString(),
 			label,
+			color: selectedColor,
 			icon: selectedIcon,
 			locations,
 		});

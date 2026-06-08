@@ -113,7 +113,6 @@ export default function Map() {
             },
             { duration: 750 }
         );
-        console.log(milesToMeters(targetLocation.radiusMiles) * 2);
     }, [targetLocation]);
 
     return (
@@ -195,15 +194,16 @@ export default function Map() {
                 )}
 
                 {getSavedLocations().map((location) => (
+                    
                     <Marker
                         key={location.id}
                         coordinate={location.coordinate}
                         title={location.label}
                         description={location.address}
                     >
-                        <View style={[styles.savedLocationMarker, { shadowColor: theme.colors.primaryText, backgroundColor: theme.colors.secondaryBackground}]}>
+                        <View style={[styles.savedLocationMarker, { backgroundColor: location.color }]}>
                             <SymbolView
-                                tintColor={theme.colors.primaryText}
+                                tintColor={theme.colors.secondaryBackground}
                                 type="hierarchical"
                                 name={location.icon}
                                 size={MARKER_ICON_SIZE}

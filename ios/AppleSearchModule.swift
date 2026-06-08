@@ -7,6 +7,7 @@ import CoreLocation
 class AppleSearchModule: RCTEventEmitter, MKLocalSearchCompleterDelegate {
 
     private var completer: MKLocalSearchCompleter!
+    private var currentContext: String = ""
 
     override init() {
         super.init()
@@ -48,16 +49,18 @@ class AppleSearchModule: RCTEventEmitter, MKLocalSearchCompleterDelegate {
         latitude: Double,
         longitude: Double,
         radiusMeters: Double,
-        resultTypes: [String]
+        resultTypes: [String],
+        context: String
     ) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
 
             if query.trimmingCharacters(in: .whitespaces).isEmpty {
-                self.sendEvent(withName: "searchResults", body: [])
+                self.sendEvent(withName: "searchResults", body: ["context": context, "results": []])
                 return
             }
 
+            self.currentContext = context
             self.completer.resultTypes = self.resolveResultTypes(resultTypes)
 
             let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
@@ -70,15 +73,16 @@ class AppleSearchModule: RCTEventEmitter, MKLocalSearchCompleterDelegate {
     // MARK: - Completer Search (unbiased)
 
     @objc
-    func startSearchUnbiased(_ query: String, resultTypes: [String]) {
+    func startSearchUnbiased(_ query: String, resultTypes: [String], context: String) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
 
             if query.trimmingCharacters(in: .whitespaces).isEmpty {
-                self.sendEvent(withName: "searchResults", body: [])
+                self.sendEvent(withName: "searchResults", body: ["context": context, "results": []])
                 return
             }
 
+            self.currentContext = context
             self.completer.resultTypes = self.resolveResultTypes(resultTypes)
             self.completer.region = MKCoordinateRegion(.world)
             self.completer.queryFragment = query
@@ -101,12 +105,12 @@ class AppleSearchModule: RCTEventEmitter, MKLocalSearchCompleterDelegate {
                 "subtitle": result.subtitle
             ]
         }
-        sendEvent(withName: "searchResults", body: results)
+        sendEvent(withName: "searchResults", body: ["context": currentContext, "results": results])
     }
 
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         print("🔴 completer error:", error)
-        sendEvent(withName: "searchResults", body: [])
+        sendEvent(withName: "searchResults", body: ["context": currentContext, "results": []])
     }
 
     // MARK: - Resolve (one-shot promise, gets full place detail)

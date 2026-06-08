@@ -1,4 +1,3 @@
-
 import { SavedLocation, SavedLocationGroup } from "@/types/location";
 import { create } from "zustand";
 
@@ -16,6 +15,8 @@ type SavedLocationStore = {
     removeSavedLocationGroup: (
         id: string
     ) => void;
+
+    clearSavedLocations: () => void;
 
     getSavedLocations: () => SavedLocation[];
 
@@ -52,10 +53,18 @@ export const useSavedLocationStore =
                     ),
             })),
 
+        clearSavedLocations: () =>
+            set({ savedLocationGroups: [] }),
+
         getSavedLocations: () =>
             get()
                 .savedLocationGroups
-                .flatMap((group) => group.locations),
+                .flatMap((group) =>
+                    group.locations.map((location) => ({
+                        ...location,
+                        color: location.color ?? group.color,
+                    }))
+                ),
 
         getLocationCount: () =>
             get()

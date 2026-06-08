@@ -47,6 +47,7 @@ export type POICategory =
 export interface SavedLocation {
     id: string;
     label: string;
+    color: string; 
 
     name: string;
     address: string;
@@ -70,6 +71,7 @@ export interface SavedLocationGroup {
     id: string;
     label: string;
     icon: SavedLocationIcon;
+    color: string;
     locations: SavedLocation[];
 }
 
