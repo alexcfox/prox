@@ -1,99 +1,78 @@
 import { SymbolViewProps } from "expo-symbols";
-import { POICategory } from "./location";
+
+export const ICON_CATEGORIES = [
+    "Food & Drink",
+    "Shopping",
+    "Education",
+    "Family",
+    "Health",
+    "Finance",
+    "Services",
+    "Transit",
+    "Entertainment",
+    "Home",
+] as const;
 
 export type SavedLocationIcon = SymbolViewProps["name"];
+export type IconCategory = typeof ICON_CATEGORIES[number];
 
-const POI_ICON_MAP: Record<POICategory, SavedLocationIcon> = {
-    airport: "airplane",
-    amusementPark: "star.fill",
-    aquarium: "fish.fill",
-    atm: "banknote.fill",
-    bakery: "birthday.cake.fill",
-    bank: "building.columns.fill",
-    beach: "beach.umbrella.fill",
-    brewery: "mug.fill",
-    cafe: "cup.and.saucer.fill",
-    campground: "tent.fill",
-    carRental: "car.fill",
-    evCharger: "bolt.car.fill",
-    fireStation: "flame.fill",
-    fitnessCenter: "dumbbell.fill",
-    foodMarket: "cart.fill",
-    gasStation: "fuelpump.fill",
-    hospital: "cross.fill",
-    hotel: "bed.double.fill",
-    laundry: "washer.fill",
-    library: "books.vertical.fill",
-    marina: "sailboat.fill",
-    movieTheater: "film.fill",
-    museum: "building.columns.fill",
-    nationalPark: "tree.fill",
-    nightlife: "music.note",
-    park: "leaf.fill",
-    parking: "parkingsign",
-    pharmacy: "pills.fill",
-    police: "shield.fill",
-    postOffice: "envelope.fill",
-    publicTransport: "tram.fill",
-    restaurant: "fork.knife",
-    restroom: "toilet.fill",
-    school: "graduationcap.fill",
-    stadium: "sportscourt.fill",
-    store: "bag.fill",
-    theater: "theatermasks.fill",
-    university: "building.fill",
-    winery: "wineglass.fill",
-    zoo: "pawprint.fill",
-    unknown: "mappin",
-};
-
-export function iconForPOICategory(category: POICategory): SavedLocationIcon {
-    return POI_ICON_MAP[category];
+export interface CategorizedIcon {
+    icon: SavedLocationIcon;
+    category: IconCategory;
 }
 
-export const PERSONAL_ICONS: { label: string; icon: SavedLocationIcon }[] = [
-    { label: "Work", icon: "briefcase.fill" },
-    { label: "Home", icon: "house.fill" },
-    { label: "School", icon: "graduationcap.fill" },
-    { label: "Friend", icon: "person.fill" },
-    { label: "Family", icon: "figure.2.and.child.holdinghands" },
-    { label: "Gym", icon: "dumbbell.fill" },
-    { label: "Doctor", icon: "stethoscope" },
-    { label: "Favorite", icon: "heart.fill" },
-    { label: "Star", icon: "star.fill" },
-    { label: "Pin", icon: "mappin" },
-];
+export const ALL_ICONS: CategorizedIcon[] = [
+    // Food & Drink
+    { icon: "fork.knife", category: "Food & Drink" },
+    { icon: "takeoutbag.and.cup.and.straw.fill", category: "Food & Drink" },
+    { icon: "cup.and.saucer.fill", category: "Food & Drink" },
+    { icon: "wineglass.fill", category: "Food & Drink" },
 
-export const POI_ICONS: { label: string; icon: SavedLocationIcon }[] = [
-    { label: "Restaurant", icon: "fork.knife" },
-    { label: "Cafe", icon: "cup.and.saucer.fill" },
-    { label: "Bar", icon: "mug.fill" },
-    { label: "Grocery", icon: "cart.fill" },
-    { label: "Park", icon: "leaf.fill" },
-    { label: "Hospital", icon: "cross.fill" },
-    { label: "Pharmacy", icon: "pills.fill" },
-    { label: "Gas", icon: "fuelpump.fill" },
-    { label: "EV", icon: "bolt.car.fill" },
-    { label: "Parking", icon: "parkingsign" },
-    { label: "Transit", icon: "tram.fill" },
-    { label: "Airport", icon: "airplane" },
-    { label: "Hotel", icon: "bed.double.fill" },
-    { label: "Museum", icon: "building.columns.fill" },
-    { label: "Theater", icon: "theatermasks.fill" },
-    { label: "Movie", icon: "film.fill" },
-    { label: "Stadium", icon: "sportscourt.fill" },
-    { label: "Beach", icon: "beach.umbrella.fill" },
-    { label: "Campground", icon: "tent.fill" },
-    { label: "Nature", icon: "tree.fill" },
-    { label: "Library", icon: "books.vertical.fill" },
-    { label: "Bank", icon: "building.columns.fill" },
-    { label: "ATM", icon: "banknote.fill" },
-    { label: "Store", icon: "bag.fill" },
-    { label: "Laundry", icon: "washer.fill" },
-    { label: "Marina", icon: "sailboat.fill" },
-    { label: "Nightlife", icon: "music.note" },
-    { label: "Zoo", icon: "pawprint.fill" },
-    { label: "Aquarium", icon: "fish.fill" },
-];
+    // Health
+    { icon: "dumbbell.fill", category: "Health" },
+    { icon: "figure.run", category: "Health" },
+    { icon: "cross.fill", category: "Health" },
 
-export const ALL_ICONS = [...PERSONAL_ICONS, ...POI_ICONS];
+    // Shopping
+    { icon: "cart.fill", category: "Shopping" },
+    { icon: "bag.fill", category: "Shopping" },
+    { icon: "tshirt.fill", category: "Shopping" },
+    { icon: "hammer.fill", category: "Shopping" },
+
+    // Education
+    { icon: "book.fill", category: "Education" },
+    { icon: "building.columns.fill", category: "Education" },
+    { icon: "graduationcap.fill", category: "Education" },
+
+    // Family
+    { icon: "tree.fill", category: "Family" },
+    { icon: "figure.and.child.holdinghands", category: "Family" },
+    { icon: "pawprint.fill", category: "Family" },
+
+    // Finance
+    { icon: "banknote.fill", category: "Finance" },
+    { icon: "creditcard.fill", category: "Finance" },
+
+    // Services
+    { icon: "shippingbox.fill", category: "Services" },
+    { icon: "scissors", category: "Services" },
+    { icon: "car.fill", category: "Services" },
+    { icon: "washer.fill", category: "Services" },
+
+    // Transit
+    { icon: "bus.fill", category: "Transit" },
+    { icon: "tram.fill", category: "Transit" },
+    { icon: "airplane", category: "Transit" },
+    { icon: "fuelpump.fill", category: "Transit" },
+
+    // Entertainment
+    { icon: "film.fill", category: "Entertainment" },
+    { icon: "music.note", category: "Entertainment" },
+    { icon: "sportscourt.fill", category: "Entertainment" },
+    { icon: "theatermasks.fill", category: "Entertainment" },
+
+    // Home
+    { icon: "house.fill", category: "Home" },
+    { icon: "building.2.fill", category: "Home" },
+    { icon: "mappin.circle.fill", category: "Home" },
+];

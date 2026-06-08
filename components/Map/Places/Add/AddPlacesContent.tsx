@@ -3,7 +3,7 @@ import { useAppleSearch } from "@/hooks/useAppleSearch";
 import { usePlacesSheetStore } from "@/stores/placesSheetStore";
 import { useTargetLocationStore } from "@/stores/targetLocationStore";
 import { useTheme } from "@/theme/theme";
-import { ALL_ICONS, iconForPOICategory } from "@/types/icons";
+import { ALL_ICONS, ICON_CATEGORIES } from "@/types/icons";
 import { ResolvedLocation, SavedLocation } from "@/types/location";
 import { parsePOICategory } from "@/types/location-mapping";
 import { getTileRegions, milesToMeters } from "@/utils/geo";
@@ -71,7 +71,7 @@ export default function AddPlacesContent() {
             const raw: ResolvedLocation = await AppleSearchModule.resolve(item.title, item.subtitle);
 
             const poiCategory = parsePOICategory(raw.pointOfInterestCategory);
-            const icon = iconForPOICategory(poiCategory);
+            const icon = "mappin.circle.fill";
 
             const location: SavedLocation = {
                 id: Date.now().toString(),
@@ -343,39 +343,44 @@ export default function AddPlacesContent() {
                     </View>
 
                     <Text style={[styles.sectionHeader, { color: theme.colors.secondaryText }]}>ICON</Text>
-                    <View style={[styles.iconGrid, { backgroundColor: theme.colors.background }]}>
-                        {ALL_ICONS.map(({ label: iconLabel, icon }, index) => {
-                            const selected = selectedIcon === icon;
-                            return (
-                                <TouchableOpacity
-                                    key={index}
-                                    style={[
-                                        styles.iconCell,
-                                        selected && { backgroundColor: theme.colors.mutedBackground },
-                                    ]}
-                                    onPress={() => {
-                                        setSelectedIcon(icon);
-                                        Keyboard.dismiss();
-                                    }}
-                                >
-                                    <SymbolView
-                                        name={icon}
-                                        size={22}
-                                        type="hierarchical"
-                                        tintColor={selected ? theme.colors.accent : theme.colors.primaryText}
-                                    />
-                                    <Text
-                                        style={[
-                                            styles.iconLabel,
-                                            { color: selected ? theme.colors.accent : theme.colors.secondaryText },
-                                        ]}
-                                    >
-                                        {iconLabel}
-                                    </Text>
-                                </TouchableOpacity>
-                            );
-                        })}
-                    </View>
+					<View style={{ backgroundColor: theme.colors.background, borderRadius: 12 }}>
+						{ICON_CATEGORIES.map((category) => {
+							const icons = ALL_ICONS.filter((i) => i.category === category);
+							if (icons.length === 0) return null;
+							return (
+								<View key={category}>
+									<Text style={[styles.iconCategoryHeader, { color: theme.colors.secondaryText }]}>
+										{category.toUpperCase()}
+									</Text>
+									<View style={styles.iconGrid}>
+										{icons.map(({ icon }, index) => {
+											const selected = selectedIcon === icon;
+											return (
+												<TouchableOpacity
+													key={index}
+													style={[
+														styles.iconCell,
+														selected && { backgroundColor: theme.colors.mutedBackground },
+													]}
+													onPress={() => {
+														setSelectedIcon(icon);
+														Keyboard.dismiss();
+													}}
+												>
+													<SymbolView
+														name={icon}
+														size={22}
+														type="hierarchical"
+														tintColor={selected ? theme.colors.accent : theme.colors.primaryText}
+													/>
+												</TouchableOpacity>
+											);
+										})}
+									</View>
+								</View>
+							);
+						})}
+					</View>
                 </View>
             </View>
         );
@@ -575,4 +580,12 @@ const styles = StyleSheet.create({
         height: 28,
         borderRadius: 14,
     },
+	iconCategoryHeader: {
+		fontSize: 11,
+		fontWeight: "600",
+		letterSpacing: 0.5,
+		paddingHorizontal: 12,
+		paddingTop: 12,
+		paddingBottom: 4,
+	},
 });

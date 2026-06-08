@@ -8,6 +8,7 @@ class AppleSearchModule: RCTEventEmitter, MKLocalSearchCompleterDelegate {
 
     private var completer: MKLocalSearchCompleter!
     private var currentContext: String = ""
+    private let geocoder = CLGeocoder()
 
     override init() {
         super.init()
@@ -113,7 +114,7 @@ class AppleSearchModule: RCTEventEmitter, MKLocalSearchCompleterDelegate {
         sendEvent(withName: "searchResults", body: ["context": currentContext, "results": []])
     }
 
-    // MARK: - Resolve (one-shot promise, gets full place detail)
+    // MARK: - Resolve (CLGeocoder only, separate rate limit from MKLocalSearch)
 
     @objc
     func resolve(
@@ -122,40 +123,37 @@ class AppleSearchModule: RCTEventEmitter, MKLocalSearchCompleterDelegate {
         resolver resolve: @escaping RCTPromiseResolveBlock,
         rejecter reject: @escaping RCTPromiseRejectBlock
     ) {
-        DispatchQueue.main.async {
-            let searchRequest = MKLocalSearch.Request()
-            searchRequest.naturalLanguageQuery = "\(title) \(subtitle)"
+        let query = subtitle.isEmpty ? title : "\(title) \(subtitle)"
 
-            let search = MKLocalSearch(request: searchRequest)
-            search.start { response, error in
-                if let error = error {
-                    reject("RESOLVE_ERROR", error.localizedDescription, error)
-                    return
-                }
-
-                guard let item = response?.mapItems.first else {
-                    reject("RESOLVE_EMPTY", "No results found", nil)
-                    return
-                }
-
-                let result: [String: Any] = [
-                    "name": item.name ?? title,
-                    "address": subtitle,
-                    "latitude": item.placemark.coordinate.latitude,
-                    "longitude": item.placemark.coordinate.longitude,
-                    "phoneNumber": item.phoneNumber ?? "",
-                    "url": item.url?.absoluteString ?? "",
-                    "pointOfInterestCategory": item.pointOfInterestCategory?.rawValue ?? "",
-                    "street": item.placemark.thoroughfare ?? "",
-                    "city": item.placemark.locality ?? "",
-                    "state": item.placemark.administrativeArea ?? "",
-                    "zip": item.placemark.postalCode ?? "",
-                    "country": item.placemark.country ?? "",
-                    "countryCode": item.placemark.isoCountryCode ?? "",
-                ]
-
-                resolve(result)
+        geocoder.geocodeAddressString(query) { placemarks, error in
+            if let error = error {
+                reject("RESOLVE_ERROR", error.localizedDescription, error)
+                return
             }
+
+            guard let placemark = placemarks?.first,
+                  let location = placemark.location else {
+                reject("RESOLVE_EMPTY", "No results found", nil)
+                return
+            }
+
+            let result: [String: Any] = [
+                "name": title,
+                "address": subtitle,
+                "latitude": location.coordinate.latitude,
+                "longitude": location.coordinate.longitude,
+                "phoneNumber": "",
+                "url": "",
+                "pointOfInterestCategory": "",
+                "street": placemark.thoroughfare ?? "",
+                "city": placemark.locality ?? "",
+                "state": placemark.administrativeArea ?? "",
+                "zip": placemark.postalCode ?? "",
+                "country": placemark.country ?? "",
+                "countryCode": placemark.isoCountryCode ?? "",
+            ]
+
+            resolve(result)
         }
     }
 
