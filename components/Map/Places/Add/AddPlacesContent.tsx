@@ -240,7 +240,7 @@ export default function AddPlacesContent() {
                             />
                             <Text style={[styles.includeAllText, { color: theme.colors.accent }]}>
                                 {isEdit
-									? `Refresh ${name} locations within ${targetLocation?.radiusMiles} miles`
+									? `Refresh ${pendingSavedLocation.name} locations within ${targetLocation?.radiusMiles} miles`
 									: `Find all ${pendingSavedLocation.name} locations within ${targetLocation?.radiusMiles} miles`}
                             </Text>
                         </Pressable>
