@@ -37,16 +37,15 @@ export const ALL_ICONS: CategorizedIcon[] = [
     { icon: "cup.and.saucer.fill", category: "Food & Drink" },
     { icon: "wineglass.fill", category: "Food & Drink" },
 
-    // Health
-    { icon: "dumbbell.fill", category: "Health" },
-    { icon: "figure.run", category: "Health" },
-    { icon: "cross.fill", category: "Health" },
-
     // Shopping
     { icon: "cart.fill", category: "Shopping" },
     { icon: "bag.fill", category: "Shopping" },
     { icon: "tshirt.fill", category: "Shopping" },
-    { icon: "hammer.fill", category: "Shopping" },
+
+    // Health
+    { icon: "dumbbell.fill", category: "Health" },
+    { icon: "figure.run", category: "Health" },
+    { icon: "cross.fill", category: "Health" },
 
     // Education
     { icon: "book.fill", category: "Education" },
@@ -55,6 +54,7 @@ export const ALL_ICONS: CategorizedIcon[] = [
 
     // Family
     { icon: "tree.fill", category: "Family" },
+    { icon: "stroller.fill", category: "Family" },
     { icon: "figure.and.child.holdinghands", category: "Family" },
     { icon: "pawprint.fill", category: "Family" },
 
@@ -67,6 +67,7 @@ export const ALL_ICONS: CategorizedIcon[] = [
     { icon: "scissors", category: "Services" },
     { icon: "car.fill", category: "Services" },
     { icon: "washer.fill", category: "Services" },
+    { icon: "hammer.fill", category: "Shopping" },
 
     // Transit
     { icon: "bus.fill", category: "Transit" },

@@ -3,7 +3,7 @@ import { useAppleSearch } from "@/hooks/useAppleSearch";
 import { usePlacesSheetStore } from "@/stores/placesSheetStore";
 import { useTargetLocationStore } from "@/stores/targetLocationStore";
 import { useTheme } from "@/theme/theme";
-import { ALL_ICONS, ICON_CATEGORIES } from "@/types/icons";
+import { ALL_ICONS } from "@/types/icons";
 import { ResolvedLocation, SavedLocation } from "@/types/location";
 import { parsePOICategory } from "@/types/location-mapping";
 import { getTileRegions, milesToMeters } from "@/utils/geo";
@@ -357,44 +357,33 @@ export default function AddPlacesContent() {
                     </View>
 
                     <Text style={[styles.sectionHeader, { color: theme.colors.secondaryText }]}>ICON</Text>
-					<View style={{ backgroundColor: theme.colors.background, borderRadius: 12 }}>
-						{ICON_CATEGORIES.map((category) => {
-							const icons = ALL_ICONS.filter((i) => i.category === category);
-							if (icons.length === 0) return null;
-							return (
-								<View key={category}>
-									<Text style={[styles.iconCategoryHeader, { color: theme.colors.secondaryText }]}>
-										{category.toUpperCase()}
-									</Text>
-									<View style={styles.iconGrid}>
-										{icons.map(({ icon }, index) => {
-											const selected = selectedIcon === icon;
-											return (
-												<TouchableOpacity
-													key={index}
-													style={[
-														styles.iconCell,
-														selected && { backgroundColor: theme.colors.mutedBackground },
-													]}
-													onPress={() => {
-														setSelectedIcon(icon);
-														Keyboard.dismiss();
-													}}
-												>
-													<SymbolView
-														name={icon}
-														size={22}
-														type="hierarchical"
-														tintColor={selected ? theme.colors.accent : theme.colors.primaryText}
-													/>
-												</TouchableOpacity>
-											);
-										})}
-									</View>
-								</View>
-							);
-						})}
-					</View>
+						<View style={{ backgroundColor: theme.colors.background, borderRadius: 12 }}>
+							<View style={styles.iconGrid}>
+								{ALL_ICONS.map(({ icon }, index) => {
+									const selected = selectedIcon === icon;
+									return (
+										<TouchableOpacity
+											key={index}
+											style={[
+												styles.iconCell,
+												selected && { backgroundColor: theme.colors.mutedBackground },
+											]}
+											onPress={() => {
+												setSelectedIcon(icon);
+												Keyboard.dismiss();
+											}}
+										>
+											<SymbolView
+												name={icon}
+												size={22}
+												type="hierarchical"
+												tintColor={selected ? theme.colors.accent : theme.colors.primaryText}
+											/>
+										</TouchableOpacity>
+									);
+								})}
+							</View>
+						</View>
                 </View>
             </View>
         );
@@ -578,10 +567,12 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     colorGrid: {
+		justifyContent: 'space-between',
         flexDirection: "row",
         flexWrap: "wrap",
+		padding: 8,
         borderRadius: 12,
-        padding: 8,
+        marginBottom: 24,
     },
     colorCell: {
         width: "10%",
