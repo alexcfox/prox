@@ -46,6 +46,7 @@ export default function AddPlacesContent() {
         showIncludeAll,
         includeAllLocations,
 		hasCheckedDuplicates,
+		duplicateLocations,
 		setHasCheckedDuplicates,
         setPendingSavedLocation,
         setLabel,
@@ -239,8 +240,8 @@ export default function AddPlacesContent() {
                             />
                             <Text style={[styles.includeAllText, { color: theme.colors.accent }]}>
                                 {isEdit
-									? `Update nearby ${pendingSavedLocation.name} locations`
-									: `Find all nearby ${pendingSavedLocation.name} locations`}
+									? `Refresh ${name} locations within ${targetLocation?.radiusMiles} miles`
+									: `Find all ${pendingSavedLocation.name} locations within ${targetLocation?.radiusMiles} miles`}
                             </Text>
                         </Pressable>
                     )}
@@ -289,7 +290,7 @@ export default function AddPlacesContent() {
                                 )}
                             </View>
                             <Text style={[styles.includeAllText, { color: theme.colors.primaryText }]}>
-                                Include all {pendingSavedLocation.name} locations within {targetLocation?.radiusMiles} miles
+                                Include all nearby {pendingSavedLocation.name} locations
                             </Text>
                         </Pressable>
                     )}
@@ -309,7 +310,7 @@ export default function AddPlacesContent() {
                                 style={{ marginRight: 10 }}
                             />
                             <Text style={[styles.includeAllText, { color: theme.colors.secondaryText }]}>
-                                No other {pendingSavedLocation.name} locations found nearby
+                                No other {pendingSavedLocation.name} locations found
                             </Text>
                         </View>
                     )}
