@@ -18,10 +18,19 @@ type Props = {
 
 export default function Places({ sheetIndex }: Props) {
 	const theme = useTheme();
-	const { addSavedLocationGroup } = useSavedLocationStore();
-	const { pendingSavedLocation, label, selectedIcon, selectedColor, clearPendingSavedLocation } = usePlacesSheetStore();
 	const [swipingId, setSwipingId] = useState<string | null>(null);
-	const { includeAllLocations, duplicateLocations } = usePlacesSheetStore();
+	const {
+		pendingSavedLocation,
+		pendingEditGroup,
+		hasCheckedDuplicates,
+		label, selectedIcon, selectedColor,
+		clearPendingSavedLocation,
+		setPendingEditGroup,
+		includeAllLocations,
+		duplicateLocations,
+	} = usePlacesSheetStore();
+
+	const { addSavedLocationGroup, updateSavedLocationGroup } = useSavedLocationStore();
 
 	const handleSave = () => {
 		if (!pendingSavedLocation) return;
@@ -31,16 +40,12 @@ export default function Places({ sheetIndex }: Props) {
 		if (includeAllLocations && duplicateLocations.length > 1) {
 			locations = duplicateLocations.map((raw, i) => {
 				const poiCategory = parsePOICategory(raw.pointOfInterestCategory);
-
 				return {
 					id: `${Date.now()}-${i}`,
 					label,
 					name: raw.name,
 					address: raw.address,
-					coordinate: {
-						latitude: raw.latitude,
-						longitude: raw.longitude,
-					},
+					coordinate: { latitude: raw.latitude, longitude: raw.longitude },
 					phoneNumber: raw.phoneNumber,
 					url: raw.url,
 					poiCategory,
@@ -54,24 +59,40 @@ export default function Places({ sheetIndex }: Props) {
 					color: selectedColor,
 				};
 			});
+		} else if (pendingEditGroup && !hasCheckedDuplicates) {
+			locations = pendingEditGroup.locations.map(loc => ({
+				...loc,
+				label,
+				icon: selectedIcon,
+				color: selectedColor,
+			}));
 		} else {
-			locations = [
-				{
-					...pendingSavedLocation,
-					label,
-					icon: selectedIcon,
-					color: selectedColor,
-				},
-			];
+			locations = [{
+				...pendingSavedLocation,
+				label,
+				icon: selectedIcon,
+				color: selectedColor,
+			}];
 		}
 
-		addSavedLocationGroup({
-			id: Date.now().toString(),
-			label,
-			color: selectedColor,
-			icon: selectedIcon,
-			locations,
-		});
+		if (pendingEditGroup) {
+			updateSavedLocationGroup({
+				...pendingEditGroup,
+				label,
+				color: selectedColor,
+				icon: selectedIcon,
+				locations,
+			});
+			setPendingEditGroup(null);
+		} else {
+			addSavedLocationGroup({
+				id: Date.now().toString(),
+				label,
+				color: selectedColor,
+				icon: selectedIcon,
+				locations,
+			});
+		}
 
 		clearPendingSavedLocation();
 	};
@@ -133,13 +154,13 @@ export default function Places({ sheetIndex }: Props) {
 				</>
 			</BottomSheetScrollView>
 
-			{pendingSavedLocation && (
+			{(pendingSavedLocation || pendingEditGroup) && (
 				<Pressable
 					onPress={handleSave}
 					style={[styles.saveButton, { backgroundColor: theme.colors.accent }]}
 				>
 					<Text style={[styles.saveButtonText, { color: theme.colors.coloredButtonText }]}>
-						Save Place
+						{pendingEditGroup ? "Save Changes" : "Save Place"}
 					</Text>
 				</Pressable>
 			)}

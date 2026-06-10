@@ -27,7 +27,6 @@ export default function AddPlacesContent() {
     const theme = useTheme();
     const { targetLocation } = useTargetLocationStore();
     const [isCheckingDuplicates, setIsCheckingDuplicates] = React.useState(false);
-    const [hasCheckedDuplicates, setHasCheckedDuplicates] = React.useState(false);
 
     const region = targetLocation
         ? {
@@ -40,11 +39,14 @@ export default function AddPlacesContent() {
     const { query, results, search } = useAppleSearch(region, "addPlacesContent");
     const {
         pendingSavedLocation,
+		pendingEditGroup,
         label,
         selectedIcon,
         selectedColor,
         showIncludeAll,
         includeAllLocations,
+		hasCheckedDuplicates,
+		setHasCheckedDuplicates,
         setPendingSavedLocation,
         setLabel,
         setSelectedIcon,
@@ -71,7 +73,7 @@ export default function AddPlacesContent() {
             const raw: ResolvedLocation = await AppleSearchModule.resolve(item.title, item.subtitle);
 
             const poiCategory = parsePOICategory(raw.pointOfInterestCategory);
-            const icon = "mappin.circle.fill";
+            const icon = "mappin";
 
             const location: SavedLocation = {
                 id: Date.now().toString(),
@@ -178,18 +180,27 @@ export default function AddPlacesContent() {
         return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
     }
 
+	React.useEffect(() => {
+		if (!pendingSavedLocation) {
+			setHasCheckedDuplicates(false);
+			setIsCheckingDuplicates(false);
+		}
+	}, [pendingSavedLocation]);
+
+	const isEdit = pendingEditGroup !== null;
+
     // ─── Confirm View ─────────────────────────────────────────────────────────
     if (pendingSavedLocation) {
         return (
             <View style={[styles.container, { backgroundColor: theme.colors.secondaryBackground }]}>
                 <View style={styles.confirmContainer}>
                     <View style={[styles.previewCard, { backgroundColor: theme.colors.background }]}>
-                        <View style={[styles.previewIcon, { backgroundColor: theme.colors.mutedBackground }]}>
+                        <View style={[styles.previewIcon, { backgroundColor: selectedColor }]}>
                             <SymbolView
                                 name={selectedIcon}
                                 size={28}
                                 type="hierarchical"
-                                tintColor={selectedColor}
+                                tintColor={theme.colors.secondaryBackground}
                             />
                         </View>
                         <View style={styles.previewText}>
@@ -227,7 +238,9 @@ export default function AddPlacesContent() {
                                 style={{ marginRight: 10 }}
                             />
                             <Text style={[styles.includeAllText, { color: theme.colors.accent }]}>
-                                Find all nearby {pendingSavedLocation.name} locations
+                                {isEdit
+									? `Update nearby ${pendingSavedLocation.name} locations`
+									: `Find all nearby ${pendingSavedLocation.name} locations`}
                             </Text>
                         </Pressable>
                     )}
@@ -487,7 +500,7 @@ const styles = StyleSheet.create({
     previewIcon: {
         width: 48,
         height: 48,
-        borderRadius: 12,
+        borderRadius: 36,
         alignItems: "center",
         justifyContent: "center",
     },

@@ -128,14 +128,14 @@ export default function PlaceRow({
                             styles.iconContainer,
                             {
                                 backgroundColor:
-                                    theme.colors.background,
+                                    group.color
                             },
                         ]}
                     >
                         <SymbolView
                             name={group.icon}
                             size={24}
-                            tintColor={theme.colors.primaryText}
+                            tintColor={theme.colors.secondaryBackground}
                         />
                     </View>
 

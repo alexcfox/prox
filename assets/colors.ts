@@ -1,6 +1,6 @@
 import { ColorSchemeName } from "react-native";
 
-const ACCENT = "#2b9348";
+export const ACCENT = "#2b9348";
 
 export const Colors = {
     light: {
@@ -44,11 +44,10 @@ export const MARKER_COLORS = [
     "#FF3B30", // Red
     "#FF9500", // Orange
     "#FFCC00", // Yellow
-    "#34C759", // Green
+    ACCENT, // Green
     "#00C7BE", // Teal
     "#007AFF", // Blue
     "#5856D6", // Purple
     "#AF52DE", // Violet
     "#FF2D55", // Pink
-    "#FFFFFF", // White
 ];

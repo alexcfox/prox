@@ -1,5 +1,6 @@
 import PlaceRow from "@/components/PlaceRow";
 import AnimatedDivider from "@/components/Shared/AnimatedDivider";
+import { usePlacesSheetStore } from "@/stores/placesSheetStore";
 import { useSavedLocationStore } from "@/stores/savedLocationStore";
 import { useTheme } from "@/theme/theme";
 import { SymbolView } from "expo-symbols";
@@ -18,6 +19,7 @@ export default function ListPlacesContent({
 
     const theme = useTheme();
     const { savedLocationGroups, removeSavedLocationGroup } = useSavedLocationStore();
+    const { setPendingEditGroup, setPendingSavedLocation } = usePlacesSheetStore();
 
     return (
         <>
@@ -67,7 +69,10 @@ export default function ListPlacesContent({
                             <Fragment key={group.id}>
                                 <PlaceRow
                                     group={group}
-                                    onPress={() => console.log(group.locations)}
+                                    onPress={() => {
+                                        setPendingEditGroup(group);
+                                        setPendingSavedLocation(group.locations[0]);
+                                    }}
                                     onDelete={() =>
                                         removeSavedLocationGroup(group.id)
                                     }

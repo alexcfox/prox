@@ -88,6 +88,7 @@ export default function MapLocationControl() {
     };
 
     const handleSelect = async (item: { title: string; subtitle: string }) => {
+        setInputFocused(false);
         setResolving(true);
         inputRef.current?.blur();
         Keyboard.dismiss();
@@ -119,6 +120,8 @@ export default function MapLocationControl() {
     };
 
     const handleUseCurrentLocation = async () => {
+
+        setInputFocused(false);
         if (!userLocation) return;
         setResolving(true);
         inputRef.current?.blur();

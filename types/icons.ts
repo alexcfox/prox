@@ -1,6 +1,8 @@
 import { SymbolViewProps } from "expo-symbols";
 
 export const ICON_CATEGORIES = [
+    "Default",
+    "Home and Work",
     "Food & Drink",
     "Shopping",
     "Education",
@@ -10,7 +12,6 @@ export const ICON_CATEGORIES = [
     "Services",
     "Transit",
     "Entertainment",
-    "Home",
 ] as const;
 
 export type SavedLocationIcon = SymbolViewProps["name"];
@@ -22,6 +23,14 @@ export interface CategorizedIcon {
 }
 
 export const ALL_ICONS: CategorizedIcon[] = [
+
+    // Default
+    { icon: "mappin", category: "Default" },
+
+    // Home
+    { icon: "house.fill", category: "Home and Work" },
+    { icon: "building.2.fill", category: "Home and Work" },
+
     // Food & Drink
     { icon: "fork.knife", category: "Food & Drink" },
     { icon: "takeoutbag.and.cup.and.straw.fill", category: "Food & Drink" },
@@ -70,9 +79,4 @@ export const ALL_ICONS: CategorizedIcon[] = [
     { icon: "music.note", category: "Entertainment" },
     { icon: "sportscourt.fill", category: "Entertainment" },
     { icon: "theatermasks.fill", category: "Entertainment" },
-
-    // Home
-    { icon: "house.fill", category: "Home" },
-    { icon: "building.2.fill", category: "Home" },
-    { icon: "mappin.circle.fill", category: "Home" },
 ];

@@ -1,5 +1,6 @@
+import { ACCENT } from "@/assets/colors";
 import { SavedLocationIcon } from "@/types/icons";
-import { ResolvedLocation, SavedLocation } from "@/types/location";
+import { ResolvedLocation, SavedLocation, SavedLocationGroup } from "@/types/location";
 import { create } from "zustand";
 
 interface PlacesSheetState {
@@ -8,9 +9,12 @@ interface PlacesSheetState {
     selectedIcon: SavedLocationIcon;
     selectedColor: string;
 
+    hasCheckedDuplicates: boolean;
     duplicateLocations: ResolvedLocation[];
     includeAllLocations: boolean;
     showIncludeAll: boolean;
+
+    pendingEditGroup: SavedLocationGroup | null;
 
     setPendingSavedLocation: (location: SavedLocation) => void;
     setLabel: (label: string) => void;
@@ -18,32 +22,38 @@ interface PlacesSheetState {
     setSelectedColor: (color: string) => void;
     clearPendingSavedLocation: () => void;
 
+    setHasCheckedDuplicates: (checked: boolean) => void;
     setDuplicateLocations: (locations: ResolvedLocation[]) => void;
     setIncludeAllLocations: (include: boolean) => void;
     setShowIncludeAll: (show: boolean) => void;
+
+    setPendingEditGroup: (group: SavedLocationGroup | null) => void;
 }
 
 export const usePlacesSheetStore = create<PlacesSheetState>((set) => ({
     pendingSavedLocation: null,
     label: "",
     selectedIcon: "mappin",
-    selectedColor: "#FFFFFF",
+    selectedColor: ACCENT,
 
     showCategories: false,
 
     selectedCategory: null,
     isCategoryLoading: false,
 
+    hasCheckedDuplicates: false,
     duplicateLocations: [],
     includeAllLocations: false,
     showIncludeAll: false,
+
+    pendingEditGroup: null as SavedLocationGroup | null,
 
     setPendingSavedLocation: (location) =>
         set({
             pendingSavedLocation: location,
             label: location.label,
             selectedIcon: location.icon,
-            selectedColor: location.color ?? "#FFFFFF",
+            selectedColor: location.color ?? ACCENT,
         }),
 
     setLabel: (label) => set({ label }),
@@ -51,6 +61,9 @@ export const usePlacesSheetStore = create<PlacesSheetState>((set) => ({
     setSelectedIcon: (icon) => set({ selectedIcon: icon }),
 
     setSelectedColor: (color) => set({ selectedColor: color }),
+
+    setHasCheckedDuplicates: (checked) =>
+        set({ hasCheckedDuplicates: checked }),
 
     setDuplicateLocations: (locations) =>
         set({ duplicateLocations: locations }),
@@ -63,13 +76,21 @@ export const usePlacesSheetStore = create<PlacesSheetState>((set) => ({
 
     clearPendingSavedLocation: () =>
         set({
+            pendingEditGroup: null,
             pendingSavedLocation: null,
             label: "",
             selectedIcon: "mappin",
-            selectedColor: "#FFFFFF",
+            selectedColor: ACCENT,
 
             duplicateLocations: [],
             includeAllLocations: false,
             showIncludeAll: false,
         }),
+
+    setPendingEditGroup: (group: SavedLocationGroup | null) => set({
+        pendingEditGroup: group,
+        label: group?.label ?? "",
+        selectedColor: group?.color ?? "#FF3B30",
+        selectedIcon: group?.icon ?? "mappin",
+    }),
 }));
