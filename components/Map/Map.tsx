@@ -203,7 +203,7 @@ export default function Map() {
                     >
                         <View style={[styles.savedLocationMarker, { backgroundColor: location.color }]}>
                             <SymbolView
-                                tintColor={theme.colors.secondaryBackground}
+                                tintColor={theme.colors.coloredButtonText}
                                 type="hierarchical"
                                 name={location.icon}
                                 size={MARKER_ICON_SIZE}

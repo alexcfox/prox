@@ -21,6 +21,8 @@ type SavedLocationStore = {
     getSavedLocations: () => SavedLocation[];
 
     getLocationCount: () => number;
+
+    reorderSavedLocationGroups: (groups: SavedLocationGroup[]) => void;
 };
 
 export const useSavedLocationStore =
@@ -74,4 +76,7 @@ export const useSavedLocationStore =
                         count + group.locations.length,
                     0
                 ),
+
+        reorderSavedLocationGroups: (groups: SavedLocationGroup[]) =>
+            set({ savedLocationGroups: groups }),
     }));

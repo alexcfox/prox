@@ -135,7 +135,7 @@ export default function PlaceRow({
                         <SymbolView
                             name={group.icon}
                             size={24}
-                            tintColor={theme.colors.secondaryBackground}
+                            tintColor={theme.colors.coloredButtonText}
                         />
                     </View>
 

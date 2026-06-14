@@ -124,7 +124,7 @@ export default function AddPlacesContent() {
             const tiles = getTileRegions(latitude, longitude, radiusMiles);
             const allResults: ResolvedLocation[] = [];
             const CHUNK_SIZE = 4;
-            const DELAY_MS = 200;
+            const DELAY_MS = 500;
 
             for (let i = 0; i < tiles.length; i += CHUNK_SIZE) {
                 const chunk = tiles.slice(i, i + CHUNK_SIZE);
@@ -201,7 +201,7 @@ export default function AddPlacesContent() {
                                 name={selectedIcon}
                                 size={28}
                                 type="hierarchical"
-                                tintColor={theme.colors.secondaryBackground}
+                                tintColor={theme.colors.coloredButtonText}
                             />
                         </View>
                         <View style={styles.previewText}>
@@ -575,7 +575,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     colorCell: {
-        width: "10%",
+        width: "11%",
         aspectRatio: 1,
         alignItems: "center",
         justifyContent: "center",

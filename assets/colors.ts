@@ -28,7 +28,7 @@ export const Colors = {
         mutedBackground: "rgba(120,120,128,0.08)",
         mutedText: "#8E8E93",         
         border: "rgba(255,255,255,0.15)",
-        coloredButtonText: "#000000",
+        coloredButtonText: "#FFFFFF",
         divider: "#FFFFFF",
         swipedTab: "#252527",
         cancelRed: "#FF3B30",
@@ -47,7 +47,16 @@ export const MARKER_COLORS = [
     ACCENT, // Green
     "#00C7BE", // Teal
     "#007AFF", // Blue
-    "#5856D6", // Purple
-    "#AF52DE", // Violet
+    "#5856D6", // Indigo
+    "#BF5AF2", // Purple
     "#FF2D55", // Pink
+    "#FF6B35", // Coral
+    "#A2845E", // Tan
+    "#8E8E93", // Grey
+    "#30D158", // Mint
+    "#64D2FF", // Sky
+    "#6C3E2A", // Brown
+    "#1B2A4A", // Navy
+    "#FFD60A", // Gold
+    "#FF375F", // Rose
 ];

@@ -53,7 +53,7 @@ export const ALL_ICONS: CategorizedIcon[] = [
     { icon: "graduationcap.fill", category: "Education" },
 
     // Family
-    { icon: "tree.fill", category: "Family" },
+    { icon: "person.2.fill", category: "Family" },
     { icon: "stroller.fill", category: "Family" },
     { icon: "figure.and.child.holdinghands", category: "Family" },
     { icon: "pawprint.fill", category: "Family" },
