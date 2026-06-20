@@ -28,9 +28,10 @@ export default function Places({ sheetIndex }: Props) {
 		setPendingEditGroup,
 		includeAllLocations,
 		duplicateLocations,
+		selectedPriority,
 	} = usePlacesSheetStore();
 
-	const { addSavedLocationGroup, updateSavedLocationGroup } = useSavedLocationStore();
+	const { addSavedLocationGroup, updateSavedLocationGroup, savedLocationGroups } = useSavedLocationStore();
 
 	const handleSave = () => {
 		if (!pendingSavedLocation) return;
@@ -82,6 +83,7 @@ export default function Places({ sheetIndex }: Props) {
 				color: selectedColor,
 				icon: selectedIcon,
 				locations,
+				priority: selectedPriority,
 			});
 			setPendingEditGroup(null);
 		} else {
@@ -91,6 +93,7 @@ export default function Places({ sheetIndex }: Props) {
 				color: selectedColor,
 				icon: selectedIcon,
 				locations,
+				priority: selectedPriority,
 			});
 		}
 

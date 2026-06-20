@@ -10,15 +10,15 @@ import { getTileRegions, milesToMeters } from "@/utils/geo";
 import { SymbolView } from "expo-symbols";
 import React from "react";
 import {
-	ActivityIndicator,
-	Keyboard,
-	NativeModules,
-	Pressable,
-	StyleSheet,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View
+    ActivityIndicator,
+    Keyboard,
+    NativeModules,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from "react-native";
 
 const { AppleSearchModule } = NativeModules;
@@ -47,6 +47,8 @@ export default function AddPlacesContent() {
         includeAllLocations,
 		hasCheckedDuplicates,
 		duplicateLocations,
+        selectedPriority,
+        setSelectedPriority,
 		setHasCheckedDuplicates,
         setPendingSavedLocation,
         setLabel,
@@ -327,6 +329,27 @@ export default function AddPlacesContent() {
                         />
                     </View>
 
+                    <Text style={[styles.sectionHeader, { color: theme.colors.secondaryText }]}>FREQUENCY</Text>
+                    <View style={[styles.priorityContainer, { backgroundColor: theme.colors.background }]}>
+                        {(['daily', 'weekly', 'monthly', 'rarely'] as const).map((p) => (
+                            <Pressable
+                                key={p}
+                                onPress={() => setSelectedPriority(p)}
+                                style={[
+                                    styles.priorityOption,
+                                    selectedPriority === p && { backgroundColor: theme.colors.mutedBackground }
+                                ]}
+                            >
+                                <Text style={[
+                                    styles.priorityText,
+                                    { color: selectedPriority === p ? theme.colors.accent : theme.colors.secondaryText }
+                                ]}>
+                                    {p.charAt(0).toUpperCase() + p.slice(1)}
+                                </Text>
+                            </Pressable>
+                        ))}
+                    </View>
+
                     <Text style={[styles.sectionHeader, { color: theme.colors.secondaryText }]}>COLOR</Text>
                     <View style={[styles.colorGrid, { backgroundColor: theme.colors.background }]}>
                         {MARKER_COLORS.map((color) => {
@@ -593,4 +616,20 @@ const styles = StyleSheet.create({
 		paddingTop: 12,
 		paddingBottom: 4,
 	},
+    priorityContainer: {
+        marginBottom: 24,
+        flexDirection: 'row',
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    priorityOption: {
+        flex: 1,
+        paddingVertical: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    priorityText: {
+        fontSize: 14,
+        fontWeight: '500',
+    },
 });

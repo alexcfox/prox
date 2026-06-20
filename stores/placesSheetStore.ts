@@ -1,6 +1,6 @@
 import { ACCENT } from "@/assets/colors";
 import { SavedLocationIcon } from "@/types/icons";
-import { ResolvedLocation, SavedLocation, SavedLocationGroup } from "@/types/location";
+import { LocationPriority, ResolvedLocation, SavedLocation, SavedLocationGroup } from "@/types/location";
 import { create } from "zustand";
 
 interface PlacesSheetState {
@@ -15,6 +15,7 @@ interface PlacesSheetState {
     showIncludeAll: boolean;
 
     pendingEditGroup: SavedLocationGroup | null;
+    selectedPriority: LocationPriority;
 
     setPendingSavedLocation: (location: SavedLocation) => void;
     setLabel: (label: string) => void;
@@ -28,6 +29,8 @@ interface PlacesSheetState {
     setShowIncludeAll: (show: boolean) => void;
 
     setPendingEditGroup: (group: SavedLocationGroup | null) => void;
+
+    setSelectedPriority: (priority: LocationPriority) => void;
 }
 
 export const usePlacesSheetStore = create<PlacesSheetState>((set) => ({
@@ -47,6 +50,7 @@ export const usePlacesSheetStore = create<PlacesSheetState>((set) => ({
     showIncludeAll: false,
 
     pendingEditGroup: null as SavedLocationGroup | null,
+    selectedPriority: 'weekly',
 
     setPendingSavedLocation: (location) =>
         set({
@@ -92,5 +96,8 @@ export const usePlacesSheetStore = create<PlacesSheetState>((set) => ({
         label: group?.label ?? "",
         selectedColor: group?.color ?? "#FF3B30",
         selectedIcon: group?.icon ?? "mappin",
+        selectedPriority: group?.priority ?? "weekly",
     }),
+
+    setSelectedPriority: (priority) => set({ selectedPriority: priority }),
 }));

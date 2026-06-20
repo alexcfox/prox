@@ -67,11 +67,14 @@ export interface SavedLocation {
     icon: SavedLocationIcon;
 }
 
+export type LocationPriority = 'daily' | 'weekly' | 'monthly' | 'rarely';
+
 export interface SavedLocationGroup {
     id: string;
     label: string;
     icon: SavedLocationIcon;
     color: string;
+    priority: LocationPriority;
     locations: SavedLocation[];
 }
 

@@ -104,8 +104,7 @@ export default function MapSheet({ hidden }: Props) {
                     </Pressable>
                 )}
             >
-                <Places    sheetIndex={sheetIndex} >
-                </Places>
+                <Places    sheetIndex={sheetIndex} />
             </BottomSheet>
         </>
     );

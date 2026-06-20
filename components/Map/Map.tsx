@@ -1,3 +1,4 @@
+import { useHeatmapStore } from "@/stores/heatMapStore";
 import { useMapStore } from "@/stores/mapStore";
 import { useSavedLocationStore } from "@/stores/savedLocationStore";
 import { useTargetLocationStore } from "@/stores/targetLocationStore";
@@ -6,7 +7,7 @@ import { milesToMeters } from "@/utils/geo";
 import { SymbolView } from "expo-symbols";
 import { useEffect, useRef, useState } from "react";
 import { Keyboard, Pressable, StyleSheet, View } from "react-native";
-import MapView, { Circle, MapType, Marker } from "react-native-maps";
+import MapView, { Circle, MapType, Marker, Overlay } from "react-native-maps";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import CoinFlipButton from "../Shared/CoinFlipButton";
 import MapLocationControl from "./MapLocationControl";
@@ -23,10 +24,36 @@ const ALTITUDE: number = 10000;
 const MARKER_SIZE: number = 18; 
 const MARKER_ICON_SIZE: number = 14; 
 
-export default function Map() {
+const CELL_SIZE_DEGREES = 0.5 / 69.0;
 
+function scoreToColor(score: number): string {
+    const t = score / 100;
+    let r, g;
+    if (t < 0.25) {
+        r = 255;
+        g = Math.round(255 * (t / 0.25));
+    } else {
+        r = Math.round(255 * ((1 - t) / 0.75));
+        g = 255;
+    }
+    const alpha = t < 0.5 ? 0.15 : 0.25 + ((t - 0.5) * 0.5);
+    return `rgba(${r},${g},0,${alpha.toFixed(2)})`;
+}
+
+function cellToPolygon(lat: number, lng: number): { latitude: number; longitude: number }[] {
+    const halfLat = CELL_SIZE_DEGREES / 2;
+    const halfLng = (0.5 / (69.0 * Math.cos((lat * Math.PI) / 180))) / 2;
+    return [
+        { latitude: lat - halfLat, longitude: lng - halfLng },
+        { latitude: lat - halfLat, longitude: lng + halfLng },
+        { latitude: lat + halfLat, longitude: lng + halfLng },
+        { latitude: lat + halfLat, longitude: lng - halfLng },
+    ];
+}
+
+export default function Map() {
+    
 	const mapRef = useRef<MapView | null>(null);
-    const { getSavedLocations } = useSavedLocationStore();
 
 	const hasInitialRecentered = useRef(false);
     const { targetLocation } = useTargetLocationStore();
@@ -34,10 +61,12 @@ export default function Map() {
     const theme = useTheme();
     const { baseType, pickerVisible, openPicker, setUserLocation, userLocation } = useMapStore();
 
-    
+    const { imageUri } = useHeatmapStore();
     const mapType = BASE_MAP[baseType];
 
     const buttonOpacity = useSharedValue(pickerVisible ? 0 : 1);
+
+    const { getSavedLocations} = useSavedLocationStore();
 
     useEffect(() => {
         if (pickerVisible) {
@@ -153,6 +182,23 @@ export default function Map() {
 					}
 				}}
             >
+
+                {imageUri && targetLocation && (
+                    <Overlay
+                        image={{ uri: imageUri }}
+                        bounds={[
+                            [
+                                targetLocation.latitude - (targetLocation.radiusMiles / 69.0),
+                                targetLocation.longitude - (targetLocation.radiusMiles / (69.0 * Math.cos((targetLocation.latitude * Math.PI) / 180))),
+                            ],
+                            [
+                                targetLocation.latitude + (targetLocation.radiusMiles / 69.0),
+                                targetLocation.longitude + (targetLocation.radiusMiles / (69.0 * Math.cos((targetLocation.latitude * Math.PI) / 180))),
+                            ],
+                        ]}
+                    />
+                )}
+
                 {targetLocation && (
                     <>
                         <Circle
@@ -210,7 +256,8 @@ export default function Map() {
                             />
                         </View>
                     </Marker>
-                ))}  
+                ))} 
+
             </MapView>
 
             <MapLocationControl></MapLocationControl>
