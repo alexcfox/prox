@@ -1,3 +1,4 @@
+import { useSheetTabStore } from "@/stores/sheetTabStore";
 import { useTheme } from "@/theme/theme";
 import BottomSheet from "@gorhom/bottom-sheet";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -7,6 +8,7 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue
 } from "react-native-reanimated";
+import Budget from "../budget/Budget";
 import Places from "./Places/Places";
 
 type Props = {
@@ -52,6 +54,7 @@ export default function MapSheet({ hidden }: Props) {
     const handlePress = () => {
         sheetRef.current?.snapToIndex(1);
     };
+    const { activeTab } = useSheetTabStore();
 
     return (
         <>
@@ -104,7 +107,11 @@ export default function MapSheet({ hidden }: Props) {
                     </Pressable>
                 )}
             >
-                <Places    sheetIndex={sheetIndex} />
+                {activeTab === "budget" ? (
+                    <Budget />
+                ) : (
+                    <Places sheetIndex={sheetIndex} />
+                )}
             </BottomSheet>
         </>
     );
