@@ -1,6 +1,7 @@
 import Map from "@/components/Map/Map";
 import MapSheet from "@/components/Map/MapSheet";
 import FloatingPillTabBar from "@/components/Shared/FloatingPillTabBar";
+import { useBudgetStore } from "@/stores/budgetStore";
 import { useHeatmapStore } from "@/stores/heatMapStore";
 import { useMapStore } from "@/stores/mapStore";
 import { useSavedLocationStore } from "@/stores/savedLocationStore";
@@ -18,8 +19,9 @@ export default function HomeScreen() {
 
     const opacity = useSharedValue(1);
     const { savedLocationGroups } = useSavedLocationStore();
-    const {  targetLocation } = useTargetLocationStore();
+    const { targetLocation } = useTargetLocationStore();
     const { setHeatmap } = useHeatmapStore();
+    const { maxHomePrice } = useBudgetStore();
 
     useEffect(() => {
         if (pickerVisible) {
@@ -36,7 +38,8 @@ export default function HomeScreen() {
     const handleGenerateHeatmap = async () => {
         if (!targetLocation) return;
         setIsGenerating(true);
-        const cells = scoreGrid(targetLocation, savedLocationGroups);
+        console.log(maxHomePrice);
+        const cells = scoreGrid(targetLocation, savedLocationGroups, maxHomePrice);
         const imageUri = renderHeatmapToImage(cells, targetLocation, 1024, 1024);
         setHeatmap(cells, imageUri);
         setIsGenerating(false);
@@ -46,7 +49,7 @@ export default function HomeScreen() {
         <View style={{ flex: 1 }}>
             <Map />
             <Pressable style={styles.heatmapButton} onPress={handleGenerateHeatmap} disabled={isGenerating}>
-                {isGenerating 
+                {isGenerating
                     ? <ActivityIndicator size="small" color="white" />
                     : <Text style={styles.heatmapButtonText}>Find Neighborhoods</Text>
                 }

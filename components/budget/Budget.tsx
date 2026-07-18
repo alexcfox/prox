@@ -113,7 +113,7 @@ export default function BudgetSheet() {
             </BottomSheetScrollView>
 
             <Pressable
-                onPress={() => {/* trigger heatmap re-score */ }}
+                onPress={() => { console.log(maxHomePrice, maxRent); /* trigger heatmap re-score */ }}
                 style={[styles.saveButton, { backgroundColor: theme.colors.accent }]}
             >
                 <Text style={[styles.saveButtonText, { color: theme.colors.coloredButtonText }]}>
